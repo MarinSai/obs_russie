@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mi-mandat 2026 — Sénat et Chambre · Le Grand Continent</title>
+<script async src="https://cdn.jsdelivr.net/npm/@iframe-resizer/child@5/index.umd.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+@font-face{font-family:"GC Sanomat";src:url(fonts/sanomat-regular.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"GC Sanomat";src:url(fonts/sanomat-bold.woff2) format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:"GC National";src:url(fonts/national-regular.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"GC National";src:url(fonts/national-semibold.woff2) format("woff2");font-weight:600;font-display:swap}
+body{margin:0;background:#ffffff}
+a{color:#c62f3f}a:hover{color:#8e1a27}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0;margin:0}
+button:focus-visible,a:focus-visible{outline:2px solid #111;outline-offset:2px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.st{position:absolute;inset:0;pointer-events:none;outline:none}
+.st svg{width:100%;height:100%;display:block}
+.st path{pointer-events:visiblePainted;transition:opacity .15s}
+.st:not(:disabled) path{cursor:pointer}
+.st:not(:disabled) path:hover{opacity:.78}
+.st:focus-visible path{stroke:#111;stroke-width:2.5}
+.lbl{position:absolute;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;letter-spacing:.04em;pointer-events:none;white-space:nowrap;display:flex;align-items:center;gap:3px}
+.co{position:absolute;transform:translateY(-50%);height:20px;padding:0 7px;border-radius:999px;box-sizing:border-box;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;letter-spacing:.04em;display:flex;align-items:center;gap:3px}
+.co:hover{opacity:.8}
+.cell{position:absolute;box-sizing:border-box;border-radius:2px;transition:opacity .15s;display:flex;align-items:center;justify-content:center}
+.cell:hover{opacity:.72}
+.cell:focus-visible{outline:2px solid #111;outline-offset:1px;z-index:2}
+.hlbl{position:absolute;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:600;letter-spacing:.04em;pointer-events:none;color:#141414;background:rgba(255,255,255,.88);border-radius:999px;padding:0 4px;line-height:14px}
+.thumb{transition:border-color .2s,opacity .2s}.thumb:hover{opacity:1!important}
+.row{transition:background .15s}
+.row:hover{background:#f6f5f2}
+.pill{position:absolute;top:0;height:18px;border-radius:999px;transition:left .6s cubic-bezier(.2,.7,.2,1),width .6s cubic-bezier(.2,.7,.2,1)}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,84,98,.5)}50%{box-shadow:0 0 0 5px rgba(232,84,98,0)}}
+.live{animation:pulse 2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.live{animation:none}.pill{transition:none}}
+</style>
+</head>
+<body>
+<svg aria-hidden="true" style="position:absolute;width:0;height:0"><defs><pattern id="noel" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="5" height="5" fill="#ffffff"></rect><rect width="1" height="5" fill="#d3d0ca"></rect></pattern></defs></svg>
+<div id="app"></div>
+<script>
+// Petit adaptateur : même logique que la maquette du canevas
+class DCLogic {
+  constructor(props) { this.props = props; this.state = {}; }
+  setState(p) { this.state = Object.assign({}, this.state, typeof p === 'function' ? p(this.state) : p); window.__render(); }
+}
+</script>
+<script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { geo: null, house: null, sel: null, chamber: null, feed: null, feedErr: null };
+  }
+
+  componentDidMount() {
+    fetch('/_blob/887bfdd2f68fc724fc9240ab6081605d').then((r) => r.json()).then((g) => this.setState({ geo: g })).catch(() => {});
+    fetch('/_blob/a5181f4bc6ab58c64da7f009f2a1becd').then((r) => r.json()).then((h) => this.setState({ house: h })).catch(() => {});
+    this.startFeed();
+  }
+  componentDidUpdate(prev) {
+    if (prev.feedUrl !== this.props.feedUrl || prev.pollSeconds !== this.props.pollSeconds) this.startFeed();
+  }
+  componentWillUnmount() { clearInterval(this.timer); }
+
+  startFeed() {
+    clearInterval(this.timer);
+    const url = (this.props.feedUrl || '').trim();
+    if (!url) { if (this.state.feed) this.setState({ feed: null, feedErr: null }); return; }
+    const pull = () => fetch(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now())
+      .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then((j) => this.setState({ feed: j, feedErr: null }))
+      .catch((e) => this.setState({ feedErr: String(e) }));
+    pull();
+    this.timer = setInterval(pull, Math.max(15, this.props.pollSeconds || 60) * 1000);
+  }
+
+  // Horaires (heure de l'Est) : [premiers bureaux fermés, derniers bureaux fermés, premiers résultats] — 2026 Poll Hours Report
+  hours() {
+    return { AL: [20, 20, 20], AK: [24, 25, 25], AZ: [21, 21, 22], AR: [20.5, 20.5, 20.5], CA: [23, 23, 23], CO: [21, 21, 21], CT: [20, 20, 20], DE: [20, 20, 20], FL: [19, 20, 19], GA: [19, 19, 19], HI: [24, 24, 24], ID: [22, 23, 23], IL: [20, 20, 20], IN: [18, 19, 18], IA: [21, 21, 21], KS: [20, 21, 20], KY: [18, 19, 18], LA: [21, 21, 21], ME: [20, 20, 20], MD: [20, 20, 20], MA: [20, 20, 20], MI: [20, 21, 20], MN: [21, 21, 21], MS: [20, 20, 20], MO: [20, 20, 20], MT: [22, 22, 22], NE: [21, 21, 21], NV: [22, 22, 22], NH: [19, 20, 19], NJ: [20, 20, 20], NM: [21, 21, 21], NY: [21, 21, 21], NC: [19.5, 19.5, 19.5], ND: [20, 21, 20], OH: [19.5, 19.5, 19.5], OK: [20, 20, 20], OR: [22, 23, 23], PA: [20, 20, 20], RI: [20, 20, 20], SC: [19, 19, 19], SD: [20, 21, 21], TN: [20, 20, 20], TX: [20, 21, 20], UT: [22, 22, 22], VT: [19, 19, 19], VA: [19, 19, 19], WA: [23, 23, 23], WV: [19.5, 19.5, 19.5], WI: [21, 21, 21], WY: [21, 21, 21] };
+  }
+
+  names() {
+    return { AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'Californie', CO: 'Colorado', CT: 'Connecticut', DE: 'Delaware', FL: 'Floride', GA: 'Géorgie', HI: 'Hawaï', ID: 'Idaho', IL: 'Illinois', IN: 'Indiana', IA: 'Iowa', KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiane', ME: 'Maine', MD: 'Maryland', MA: 'Massachusetts', MI: 'Michigan', MN: 'Minnesota', MS: 'Mississippi', MO: 'Missouri', MT: 'Montana', NE: 'Nebraska', NV: 'Nevada', NH: 'New Hampshire', NJ: 'New Jersey', NM: 'Nouveau-Mexique', NY: 'New York', NC: 'Caroline du Nord', ND: 'Dakota du Nord', OH: 'Ohio', OK: 'Oklahoma', OR: 'Oregon', PA: 'Pennsylvanie', RI: 'Rhode Island', SC: 'Caroline du Sud', SD: 'Dakota du Sud', TN: 'Tennessee', TX: 'Texas', UT: 'Utah', VT: 'Vermont', VA: 'Virginie', WA: 'Washington', WV: 'Virginie-Occidentale', WI: 'Wisconsin', WY: 'Wyoming' };
+  }
+
+  // Sénat — st: [type, parti sortant, marge simulée (+ = 1er candidat), votants (milliers), candidats [nom, parti, sortant, part fixe]]
+  races() {
+    return {
+      AL: ['Siège ouvert', 'R', -28, 1400, [['Everett Wess', 'D', 0], ['Barry Moore', 'R', 0]]],
+      AK: ['Ordinaire', 'R', 1, 260, [['Mary Peltola', 'D', 0], ['Dan Sullivan', 'R', 1]]],
+      AR: ['Ordinaire', 'R', -32, 900, [['Hallie Shoffner', 'D', 0], ['Tom Cotton', 'R', 1]]],
+      CO: ['Ordinaire', 'D', 14, 2500, [['John Hickenlooper', 'D', 1], ['Mark Baisley', 'R', 0]]],
+      DE: ['Ordinaire', 'D', 18, 330, [['Chris Coons', 'D', 1], ['Michael Katz', 'R', 0]]],
+      FL: ['Partielle', 'R', -9, 7800, [['Angie Nixon', 'D', 0], ['Ashley Moody', 'R', 1]]],
+      GA: ['Ordinaire', 'D', 8, 3900, [['Jon Ossoff', 'D', 1], ['Mike Collins', 'R', 0]]],
+      ID: ['Ordinaire', 'R', -30, 590, [['Todd Achilles', 'I', 0], ['Jim Risch', 'R', 1]]],
+      IL: ['Siège ouvert', 'D', 15, 4100, [['Juliana Stratton', 'D', 0], ['Don Tracy', 'R', 0]]],
+      IA: ['Siège ouvert', 'R', -2, 1200, [['Josh Turek', 'D', 0], ['Ashley Hinson', 'R', 0]]],
+      KS: ['Ordinaire', 'R', -1, 1000, [['Adam Hamilton', 'D', 0], ['Roger Marshall', 'R', 1]]],
+      KY: ['Siège ouvert', 'R', -20, 1500, [['Charles Booker', 'D', 0], ['Andy Barr', 'R', 0]]],
+      LA: ['Sortant battu', 'R', -20, 1400, [['Jamie Davis', 'D', 0], ['Julia Letlow', 'R', 0]]],
+      ME: ['Ordinaire', 'R', 0, 680, [['Troy Jackson', 'D', 0], ['Susan Collins', 'R', 1]]],
+      MA: ['Ordinaire', 'D', 24, 2500, [['Ed Markey', 'D', 1], ['John Deaton', 'R', 0]]],
+      MI: ['Siège ouvert', 'D', 2, 4400, [['Abdul El-Sayed', 'D', 0], ['Mike Rogers', 'R', 0]]],
+      MN: ['Siège ouvert', 'D', 5, 2500, [['Peggy Flanagan', 'D', 0], ['Michele Tafoya', 'R', 0]]],
+      MS: ['Ordinaire', 'R', -9, 750, [['Scott Colom', 'D', 0], ['Cindy Hyde-Smith', 'R', 1], ['Ty Pinkins', 'I', 0, 4]]],
+      MT: ['Siège ouvert', 'R', -18, 470, [['Seth Bodnar', 'I', 0], ['Kurt Alme', 'R', 0], ['Alani Bankhead', 'D', 0, 6]]],
+      NE: ['Ordinaire', 'R', -10, 680, [['Dan Osborn', 'I', 0], ['Pete Ricketts', 'R', 1]]],
+      NH: ['Siège ouvert', 'D', 5, 620, [['Chris Pappas', 'D', 0], ['John E. Sununu', 'R', 0]]],
+      NJ: ['Ordinaire', 'D', 12, 2700, [['Cory Booker', 'D', 1], ['Justin Murphy', 'R', 0]]],
+      NM: ['Ordinaire', 'D', 10, 710, [['Ben Ray Luján', 'D', 1], ['Larry Marker', 'R', 0]]],
+      NC: ['Siège ouvert', 'R', 7, 3800, [['Roy Cooper', 'D', 0], ['Michael Whatley', 'R', 0]]],
+      OH: ['Partielle', 'R', 0, 4100, [['Sherrod Brown', 'D', 0], ['Jon Husted', 'R', 1]]],
+      OK: ['Siège ouvert', 'R', -30, 1150, [['N’Kiyla Thomas', 'D', 0], ['Kevin Hern', 'R', 0]]],
+      OR: ['Ordinaire', 'D', 18, 1950, [['Jeff Merkley', 'D', 1], ['David Brock Smith', 'R', 0]]],
+      RI: ['Ordinaire', 'D', 24, 360, [['Jack Reed', 'D', 1], ['Raymond McKay', 'R', 0]]],
+      SC: ['Ordinaire', 'R', -5, 1700, [['Annie Andrews', 'D', 0], ['Darline Graham', 'R', 1]]],
+      SD: ['Ordinaire', 'R', -30, 350, [['Brian Bengs', 'I', 0], ['Mike Rounds', 'R', 1]]],
+      TN: ['Ordinaire', 'R', -24, 1700, [['Marquita Bradshaw', 'D', 0], ['Bill Hagerty', 'R', 1]]],
+      TX: ['Sortant battu', 'R', -1, 8100, [['James Talarico', 'D', 0], ['Ken Paxton', 'R', 0]]],
+      VA: ['Ordinaire', 'D', 12, 3000, [['Mark Warner', 'D', 1], ['Bert Mizusawa', 'R', 0]]],
+      WV: ['Ordinaire', 'R', -34, 490, [['Rachel Fetty Anderson', 'D', 0], ['Shelley Moore Capito', 'R', 1]]],
+      WY: ['Siège ouvert', 'R', -40, 200, [['James W. Byrd', 'D', 0], ['Harriet Hageman', 'R', 0]]]
+    };
+  }
+
+  // Chambre — sièges détenus par parti (Press Gallery / 270toWin, sept. 2026) ; FL et TX : un siège vacant, compté avec son ancien parti
+  houseHolders() {
+    return { AL: [2, 5], AK: [0, 1], AZ: [3, 6], AR: [0, 4], CA: [44, 8], CO: [4, 4], CT: [5, 0], DE: [1, 0], FL: [8, 20], GA: [5, 9], HI: [2, 0], ID: [0, 2], IL: [14, 3], IN: [2, 7], IA: [0, 4], KS: [1, 3], KY: [1, 5], LA: [2, 4], ME: [2, 0], MD: [7, 1], MA: [9, 0], MI: [6, 7], MN: [4, 4], MS: [1, 3], MO: [2, 6], MT: [0, 2], NE: [0, 3], NV: [3, 1], NH: [2, 0], NJ: [9, 3], NM: [3, 0], NY: [19, 7], NC: [4, 10], ND: [0, 1], OH: [5, 10], OK: [0, 5], OR: [5, 1], PA: [7, 10], RI: [2, 0], SC: [1, 6], SD: [0, 1], TN: [1, 8], TX: [13, 25], UT: [0, 4], VT: [1, 0], VA: [6, 5], WA: [8, 2], WV: [0, 2], WI: [2, 6], WY: [0, 1] };
+  }
+  // Courses serrées (notes Cook relayées par 270toWin) : [sortant, marge simulée]
+  houseRated() {
+    return { 'IA-02': ['R', 0], 'MI-04': ['R', 0], 'MI-07': ['R', 0], 'MI-10': ['R', 0], 'MT-01': ['R', 0], 'OH-07': ['R', 0], 'OH-09': ['D', 0], 'PA-08': ['R', 0], 'AZ-01': ['R', 5], 'AZ-06': ['R', 5], 'CO-08': ['R', 5], 'IA-01': ['R', 5], 'IA-03': ['R', 5], 'PA-07': ['R', 5], 'PA-10': ['R', 5], 'WI-03': ['R', 5], 'AK-AL': ['R', -5], 'AZ-02': ['R', -5], 'CO-04': ['R', -5], 'CO-05': ['R', -5], 'ME-02': ['D', -5], 'MN-01': ['R', -5], 'OH-10': ['R', -5], 'OH-15': ['R', -5], 'PA-01': ['R', -5], 'WI-01': ['R', -5] };
+  }
+
+  rand(seed) { let x = 0; for (const c of seed) x = (x * 31 + c.charCodeAt(0)) >>> 0; return () => { x = (x * 1664525 + 1013904223) >>> 0; return x / 4294967296; }; }
+
+  mock(key, margin, resET, turnK, cands, scenario) {
+    const rnd = this.rand(key);
+    const finalMargin = margin + (rnd() - .5) * 7;
+    let eevp;
+    if (scenario === 'Avant le scrutin') eevp = 0;
+    else if (scenario === 'Résultats définitifs') eevp = rnd() < .2 ? 96 + Math.floor(rnd() * 4) : 100;
+    else {
+      const elapsed = 22 - resET;
+      eevp = elapsed < 0 ? 0 : elapsed === 0 ? Math.floor(4 + rnd() * 10) : Math.min(99, Math.floor(18 + elapsed * 22 + rnd() * 14));
+    }
+    const m = finalMargin + (scenario === 'Soirée électorale' ? (1 - eevp / 100) * (rnd() - .5) * 10 : 0);
+    const fixed = cands.slice(2).reduce((s, c) => s + (c[3] || 0), 0);
+    const other = 1.2 + rnd() * 2;
+    const shares = [(100 - other - fixed + m) / 2, (100 - other - fixed - m) / 2];
+    const total = Math.round(turnK * 1000 * eevp / 100 * (0.97 + rnd() * .06));
+    const res = cands.map(([n, p, inc, fx], i) => ({ n, p, inc, v: Math.round(total * (i < 2 ? shares[i] : fx || 0) / 100) }));
+    if (eevp > 0) res.push({ n: 'Autres candidats', p: 'O', inc: 0, v: Math.round(total * other / 100) });
+    const lead = Math.abs(m);
+    let winner = null, status = 'pending';
+    if (eevp > 0) {
+      status = 'counting';
+      if ((eevp >= 50 && lead > 4) || (lead > 14 && eevp >= 5) || (scenario === 'Résultats définitifs' && eevp >= 96)) {
+        winner = m > 0 ? cands[0][1] : cands[1][1]; status = eevp === 100 ? 'final' : 'called';
+      }
+    }
+    return { eevp, cands: res, winner, status };
+  }
+
+  fromFeed(f) {
+    const cands = (f.cands || []).map((c) => ({ n: c.n, p: c.p || 'O', inc: c.inc ? 1 : 0, v: +c.v || 0 }));
+    return { eevp: +f.eevp || 0, cands, winner: f.winner || null, status: f.status || (f.winner ? 'called' : (f.eevp > 0 ? 'counting' : 'pending')) };
+  }
+
+  // Liste des 435 circonscriptions, avec sortant et marge simulée (déterministe)
+  houseMeta(house) {
+    if (this._hm && this._hmSrc === house) return this._hm;
+    const HOLD = this.houseHolders(), RATED = this.houseRated();
+    const byState = {};
+    for (const c of house.cells) (byState[c.st] = byState[c.st] || []).push(c.id);
+    const meta = {};
+    for (const st in byState) {
+      const ids = byState[st].slice().sort();
+      let [nD] = HOLD[st] || [0, 0];
+      const free = [];
+      for (const id of ids) {
+        if (RATED[id]) { meta[id] = { holder: RATED[id][0], margin: RATED[id][1], rated: true }; if (RATED[id][0] === 'D') nD--; }
+        else free.push(id);
+      }
+      const rnd = this.rand('hold' + st);
+      const shuffled = free.map((id) => [rnd(), id]).sort((a, b) => a[0] - b[0]).map((x) => x[1]);
+      shuffled.forEach((id, i) => {
+        const holder = i < nD ? 'D' : 'R';
+        const r2 = this.rand('m' + id)();
+        meta[id] = { holder, margin: (holder === 'D' ? 1 : -1) * (9 + r2 * 34), rated: false };
+      });
+    }
+    this._hm = meta; this._hmSrc = house;
+    return meta;
+  }
+
+  fmtN(v) { return v.toLocaleString('fr-FR').replace(/[  ]/g, ' '); }
+  fmtP(v) { return v.toFixed(1).replace('.', ',') + ' %'; }
+
+  renderVals() {
+    const scenario = this.props.scenario ?? 'Soirée électorale';
+    const chamber = this.state.chamber || (this.props.startChamber === 'Chambre' ? 'H' : 'S');
+    const isSenate = chamber === 'S';
+    const feed = this.state.feed;
+    const HOURS = this.hours(), NAMES = this.names(), RACES = this.races();
+    const SOLID = { D: '#3b8ee6', R: '#e85462', I: '#f0b53a', O: '#b9b6b0' };
+    const TINT = { D: '#c6e1fb', R: '#f8c9ce', I: '#fbe3a1', O: '#e4e2de' };
+    const TEXT = { D: '#1f6fc4', R: '#c62f3f', I: '#8a6200', O: '#6b6965' };
+    const PNAME = { D: 'Démocrate', R: 'Républicain', I: 'Indépendant', O: '' };
+    const PENDING = '#dcd9d4';
+    const closeParis = (et) => { const h = (Math.floor(et) + 6) % 24; return String(h).padStart(2, '0') + ' h ' + (et % 1 ? '30' : '00'); };
+    const hatch = (c) => 'repeating-linear-gradient(-45deg, ' + c + ' 0 3px, #ffffff 3px 6px)';
+    const leaderOf = (res) => { const s = res.cands.filter((c) => c.p !== 'O').slice().sort((a, b) => b.v - a.v); return s[0] && s[0].v > 0 ? s[0] : null; };
+    const fillOf = (r) => r.winner ? SOLID[r.winner] : (leaderOf(r) ? TINT[leaderOf(r).p] : PENDING);
+    const txtOf = (r) => r.winner ? '#ffffff' : '#141414';
+    const statusText = (r, res) => {
+      if (r.status === 'runoff') return 'Second tour';
+      if (r.status === 'too_close') return 'Trop serré';
+      if (r.status === 'final') return 'Dépouillement terminé';
+      if (r.winner) return 'Vainqueur désigné';
+      if (r.status === 'counting') return r.eevp + ' % dépouillé';
+      return 'Résultats ' + closeParis(res);
+    };
+    const sel = this.state.sel;
+    const pickSel = (v) => () => this.setState({ sel: this.state.sel === v ? null : v });
+
+    // ---------- Sénat ----------
+    const sRes = {};
+    for (const st in RACES) {
+      const f = feed && feed.senate && feed.senate[st];
+      const r = RACES[st];
+      sRes[st] = f ? this.fromFeed(f) : this.mock(st, r[2], HOURS[st][2], r[3], r[4], scenario);
+    }
+    const sGain = (st) => !!(sRes[st] && sRes[st].winner && sRes[st].winner !== RACES[st][1]);
+
+    // ---------- Chambre ----------
+    const house = this.state.house;
+    const hRes = {}, hMeta = house ? this.houseMeta(house) : {};
+    if (house) for (const c of house.cells) {
+      const f = feed && feed.house && feed.house[c.id];
+      const m = hMeta[c.id];
+      const cands = [['Candidat démocrate', 'D', m.holder === 'D' ? 1 : 0], ['Candidat républicain', 'R', m.holder === 'R' ? 1 : 0]];
+      hRes[c.id] = f ? this.fromFeed(f) : this.mock(c.id, m.margin, HOURS[c.st][2], 260 + this.rand('t' + c.id)() * 90, cands, scenario);
+    }
+    const hGain = (id) => !!(hRes[id] && hRes[id].winner && hMeta[id] && hRes[id].winner !== hMeta[id].holder);
+
+    // ---------- Comptage ----------
+    const tally = (resMap) => {
+      const won = { D: 0, R: 0, I: 0 }, led = { D: 0, R: 0, I: 0 }; let dV = 0, rV = 0;
+      for (const k in resMap) {
+        const r = resMap[k];
+        for (const c of r.cands) { if (c.p === 'D') dV += c.v; if (c.p === 'R') rV += c.v; }
+        if (r.winner) won[r.winner] = (won[r.winner] || 0) + 1;
+        else { const l = leaderOf(r); if (l) led[l.p] = (led[l.p] || 0) + 1; }
+      }
+      return { won, led, dV, rV };
+    };
+    const T = isSenate ? tally(sRes) : tally(hRes);
+    const total = isSenate ? 100 : 435;
+    const dBase = isSenate ? 34 : 0, rBase = isSenate ? 31 : 0;
+    const dTotal = dBase + T.won.D, rTotal = rBase + T.won.R;
+    const undec = total - dTotal - rTotal - T.won.I;
+    const majD = isSenate ? 51 : 218, majR = isSenate ? 50 : 218;
+    const markAt = isSenate ? 50 : 218;
+    const pct = (n) => n / total * 100;
+    const pills = [];
+    const put = (from, n, bg, title) => { if (n > 0) pills.push({ title, style: 'left: calc(' + pct(from) + '% + 1.5px); width: calc(' + pct(n) + '% - 3px); background: ' + bg + ';' }); };
+    let x = 0;
+    if (dBase) { put(x, dBase, hatch(SOLID.D), dBase + ' sièges démocrates hors scrutin'); x += dBase; }
+    put(x, T.won.D, SOLID.D, T.won.D + ' sièges gagnés par les démocrates'); x += T.won.D;
+    put(x, T.led.D, TINT.D, T.led.D + ' courses où le démocrate est en tête'); x += T.led.D;
+    put(x, T.won.I, SOLID.I, T.won.I + ' siège(s) indépendant(s)'); x += T.won.I;
+    put(x, T.led.I, TINT.I, T.led.I + ' course(s) où un indépendant est en tête'); x += T.led.I;
+    let y = total;
+    if (rBase) { y -= rBase; put(y, rBase, hatch(SOLID.R), rBase + ' sièges républicains hors scrutin'); }
+    y -= T.won.R; put(y, T.won.R, SOLID.R, T.won.R + ' sièges gagnés par les républicains');
+    y -= T.led.R; put(y, T.led.R, TINT.R, T.led.R + ' courses où le républicain est en tête');
+    if (y - x > 0) put(x, y - x, '#f0eeea', (y - x) + ' courses sans résultat');
+    const mPct = pct(markAt);
+
+    // ---------- Carte du Sénat ----------
+    const geo = this.state.geo;
+    const sFill = (st) => sRes[st] ? fillOf(sRes[st]) : 'url(#noel)';
+    const sTxt = (st) => sRes[st] ? txtOf(sRes[st]) : '#141414';
+    const SMALL = { NH: 1, MA: 1, RI: 1, NJ: 1, DE: 1 };
+    const NUDGE = { MI: [14, 22], FL: [22, 8], LA: [-12, -4], KY: [8, 3], ID: [0, 22], MN: [-6, 4], WV: [-4, 4], VA: [10, 2], NC: [6, 0], SC: [4, 2], ME: [2, 0] };
+    const states = [], labels = [], miniS = [];
+    if (geo) for (const st in geo.states) {
+      const g = geo.states[st], has = !!RACES[st];
+      miniS.push({ d: g.d, fill: has ? sFill(st) : '#ecebe8' });
+      if (!isSenate) continue;
+      states.push({ d: g.d, fill: sFill(st), stroke: has ? '#ffffff' : '#c9c6c0', sw: has ? 1.2 : .6, disabled: !has, pick: has ? pickSel('S:' + st) : null, aria: has ? NAMES[st] + ' : voir les résultats' : NAMES[st] });
+      if (has && !SMALL[st]) {
+        const nd = NUDGE[st] || [0, 0];
+        labels.push({ t: st, gain: sGain(st), dot: sTxt(st), style: 'left: ' + ((g.cx + nd[0]) / 9.75) + '%; top: ' + ((g.cy + nd[1]) / 6.1) + '%; color: ' + sTxt(st) + ';' });
+      }
+    }
+    const CO_Y = { NH: 150, MA: 182, RI: 214, NJ: 262, DE: 300 };
+    const callouts = [], coLines = [];
+    if (geo && isSenate) for (const st in CO_Y) {
+      const g = geo.states[st], yy = CO_Y[st];
+      coLines.push({ d: 'M' + g.cx + ',' + g.cy + 'L922,' + yy + 'L930,' + yy });
+      callouts.push({ t: st, gain: sGain(st), dot: sTxt(st), aria: NAMES[st] + ' : voir les résultats', pick: pickSel('S:' + st), style: 'left: ' + (930 / 9.75) + '%; top: ' + (yy / 6.1) + '%; background: ' + sFill(st) + '; color: ' + sTxt(st) + ';' + (sel === 'S:' + st ? ' box-shadow: 0 0 0 2px #141414;' : '') });
+    }
+
+    // ---------- Carte de la Chambre ----------
+    const cells = [], miniH = [], hLabels = [];
+    const ordinal = (id) => { const n = id.split('-')[1]; return n === 'AL' ? 'siège unique' : (+n === 1 ? '1re' : +n + 'e') + ' circonscription'; };
+    if (house) {
+      const W = house.w, H = house.h;
+      for (const c of house.cells) {
+        const r = hRes[c.id], f = fillOf(r), isSel = sel === 'H:' + c.id;
+        const box = 'left: ' + (c.x / W * 100) + '%; top: ' + (c.y / H * 100) + '%; width: ' + (100 / W) + '%; height: ' + (100 / H) + '%;';
+        miniH.push({ style: 'position: absolute; ' + box + ' transform: scale(.82); background: ' + f + ';' });
+        if (isSenate) continue;
+        cells.push({
+          aria: NAMES[c.st] + ', ' + ordinal(c.id) + ' : ' + statusText(r, HOURS[c.st][2]),
+          pick: pickSel('H:' + c.id), gain: hGain(c.id), dot: txtOf(r),
+          style: box + ' background: ' + f + '; border: 1.5px solid #ffffff;' + (isSel ? ' box-shadow: inset 0 0 0 2px #141414; z-index: 3;' : '')
+        });
+      }
+      if (!isSenate) for (const st in house.labels) {
+        const [lx, ly] = house.labels[st];
+        hLabels.push({ t: st, style: 'left: ' + (lx / W * 100) + '%; top: ' + (ly / H * 100) + '%;' });
+      }
+    }
+    const hAspect = house ? house.w + ' / ' + house.h : '46 / 27';
+    const hView = house ? '0 0 ' + house.w * house.unit + ' ' + house.h * house.unit : '0 0 460 270';
+
+    // ---------- Panneau ----------
+    const EXTRA = {
+      GA: 'Sans majorité absolue, second tour le 1er décembre.',
+      AK: 'Vote préférentiel : le décompte final peut prendre plusieurs jours.',
+      ME: 'Vote préférentiel en cas d’absence de majorité absolue.',
+      NE: 'Pas de candidat démocrate : Dan Osborn, indépendant, est soutenu par les démocrates.',
+      ID: 'Pas de candidat démocrate.', SD: 'Pas de candidat démocrate.',
+      MT: 'Seth Bodnar, indépendant, est soutenu par Jon Tester.',
+      SC: 'Darline Graham a été nommée en juillet après la mort de Lindsey Graham.',
+      OK: 'Alan Armstrong, nommé en mars après le départ de Markwayne Mullin, ne se représente pas.'
+    };
+    const hoursRows = (st) => {
+      const h = HOURS[st];
+      return [
+        { k: h[0] === h[1] ? 'Fermeture des bureaux' : 'Premiers bureaux fermés', v: closeParis(h[0]) },
+        ...(h[0] === h[1] ? [] : [{ k: 'Derniers bureaux fermés', v: closeParis(h[1]) }]),
+        { k: 'Premiers résultats', v: closeParis(h[2]) }
+      ];
+    };
+    const panelFor = (r, holder, st, title, kicker, extra, back) => {
+      const tot = r.cands.reduce((s, c) => s + c.v, 0);
+      const sorted = r.eevp > 0 ? r.cands.slice().sort((a, b) => (a.p === 'O') - (b.p === 'O') || b.v - a.v) : r.cands;
+      const winC = r.winner ? sorted.find((c) => c.p === r.winner) : null;
+      const gain = r.winner && r.winner !== holder, pending = r.status === 'pending';
+      return {
+        name: title, kicker,
+        status: statusText(r, HOURS[st][2]) + (gain ? ' · gain ' + (r.winner === 'D' ? 'démocrate' : r.winner === 'R' ? 'républicain' : 'indépendant') : ''),
+        badgeStyle: r.winner ? 'background: ' + SOLID[r.winner] + '; color: #ffffff;' : (pending ? 'background: #f0eeea; color: #3a3936;' : 'background: #141414; color: #ffffff;'),
+        cands: sorted.map((c) => {
+          const share = pending || !tot ? 0 : c.v / tot * 100;
+          const isW = winC && c === winC;
+          return {
+            n: c.n, star: c.inc ? '*' : '', check: isW ? '✓ ' : '', p: PNAME[c.p] || 'Divers',
+            v: pending ? '—' : this.fmtN(c.v) + ' voix', pct: pending ? '—' : this.fmtP(share),
+            text: TEXT[c.p] || '#6b6965',
+            barStyle: 'width: ' + share + '%; background: ' + (isW || !r.winner ? SOLID[c.p] : TINT[c.p]) + ';'
+          };
+        }),
+        eevpLabel: pending ? 'Aucun résultat pour l’instant' : '≈ ' + r.eevp + ' % des votes attendus dépouillés',
+        eevpW: r.eevp + '%',
+        note: (pending ? '' : (r.winner ? 'Vainqueur désigné par l’Associated Press ; les chiffres évoluent jusqu’à la certification. ' : 'Résultats partiels, course non tranchée. ')) + (extra || ''),
+        hours: hoursRows(st),
+        hasBack: !!back, back
+      };
+    };
+    let selV = null, stSel = null;
+    if (sel && isSenate && sel.startsWith('S:')) {
+      const st = sel.slice(2), race = RACES[st];
+      const kind = race[0] === 'Partielle' ? 'Élection partielle' : race[0] === 'Siège ouvert' ? 'Siège ouvert' : race[0] === 'Sortant battu' ? 'Sortant battu à la primaire' : 'Élection ordinaire';
+      selV = panelFor(sRes[st], race[1], st, NAMES[st], kind + ' · siège ' + (race[1] === 'D' ? 'démocrate' : 'républicain'), EXTRA[st], null);
+    } else if (sel && !isSenate && sel.startsWith('H:') && hRes[sel.slice(2)]) {
+      const id = sel.slice(2), st = id.split('-')[0], m = hMeta[id];
+      selV = panelFor(hRes[id], m.holder, st, NAMES[st] + ', ' + ordinal(id), 'Chambre · siège ' + (m.holder === 'D' ? 'démocrate' : 'républicain') + ' sortant', 'Maquette : les noms des candidats viendront du flux AP.', () => this.setState({ sel: 'HS:' + st }));
+    } else if (sel && !isSenate && sel.startsWith('HS:') && house) {
+      const st = sel.slice(3);
+      const ids = house.cells.filter((c) => c.st === st).map((c) => c.id).sort();
+      let d = 0, r = 0, u = 0;
+      const rows = ids.map((id) => {
+        const res = hRes[id];
+        if (res.winner === 'D') d++; else if (res.winner === 'R') r++; else u++;
+        const tot = res.cands.reduce((s, c) => s + c.v, 0) || 1;
+        const pa = res.eevp ? res.cands[0].v / tot * 100 : 0, pb = res.eevp ? res.cands[1].v / tot * 100 : 0;
+        const barS = (p, party) => 'flex: 0 0 calc(' + p + '% - 3px); border-radius: 999px; background: ' + (res.winner ? (res.winner === party ? SOLID[party] : TINT[party]) : SOLID[party]) + ';' + (p ? '' : ' display: none;');
+        return { name: id.replace('-AL', ' (unique)'), gainMark: hGain(id) ? ' ●' : '', pick: pickSel('H:' + id), aria: NAMES[st] + ', ' + ordinal(id), status: statusText(res, HOURS[st][2]), statusColor: res.winner ? TEXT[res.winner] : '#6b6965', aStyle: barS(pa, 'D'), bStyle: barS(pb, 'R') };
+      });
+      stSel = { name: NAMES[st], kicker: 'Chambre · ' + ids.length + ' circonscription' + (ids.length > 1 ? 's' : ''), d, r, u, rows };
+    }
+
+    // ---------- Courses à suivre ----------
+    const watchRow = (name, r, a, b, gain, pick, resET) => {
+      const tot = r.cands.reduce((s, c) => s + c.v, 0) || 1;
+      const pa = r.eevp ? a.v / tot * 100 : 0, pb = r.eevp ? b.v / tot * 100 : 0;
+      const last = (n) => n.startsWith('Candidat') ? (n.endsWith('démocrate') ? 'Dém.' : 'Rép.') : n.split(' ').slice(-1)[0];
+      const barS = (c, p) => 'flex: 0 0 calc(' + p + '% - 3px); border-radius: 999px; background: ' + (r.winner ? (r.winner === c.p ? SOLID[c.p] : TINT[c.p]) : SOLID[c.p]) + ';' + (p ? '' : ' display: none;');
+      return {
+        name, gainMark: gain ? ' ●' : '', pick, aria: name + ', ' + statusText(r, resET),
+        status: statusText(r, resET), statusColor: r.winner ? TEXT[r.winner] : '#6b6965',
+        aStyle: barS(a, pa), bStyle: barS(b, pb),
+        a: last(a.n) + (a.inc ? '*' : '') + (r.eevp ? '  ' + this.fmtP(pa) : ''),
+        b: (r.eevp ? this.fmtP(pb) + '  ' : '') + last(b.n) + (b.inc ? '*' : '')
+      };
+    };
+    const watch = isSenate
+      ? ['OH', 'TX', 'IA', 'KS', 'ME', 'MI', 'AK', 'MN', 'NH', 'NC', 'SC'].map((st) => watchRow(NAMES[st], sRes[st], sRes[st].cands[0], sRes[st].cands[1], sGain(st), pickSel('S:' + st), HOURS[st][2]))
+      : (house ? ['IA-02', 'MI-04', 'MI-07', 'MI-10', 'MT-01', 'OH-07', 'OH-09', 'PA-08', 'AZ-01', 'AZ-06', 'CO-08', 'PA-07'].filter((id) => hRes[id]).map((id) => { const st = id.split('-')[0], r = hRes[id]; return watchRow(NAMES[st] + ' · ' + id, r, r.cands[0], r.cands[1], hGain(id), pickSel('H:' + id), HOURS[st][2]); }) : []);
+
+    // ---------- Calendrier ----------
+    const NOW_ET = scenario === 'Avant le scrutin' ? 0 : scenario === 'Soirée électorale' ? 22.2 : 99;
+    const bySlot = {};
+    const slotStates = isSenate ? Object.keys(RACES) : Object.keys(HOURS);
+    for (const st of slotStates) { const t = HOURS[st][2]; (bySlot[t] = bySlot[t] || []).push(st); }
+    const hByState = {};
+    if (house) for (const c of house.cells) (hByState[c.st] = hByState[c.st] || []).push(c.id);
+    const slots = Object.keys(bySlot).map(Number).sort((a, b) => a - b).map((t) => {
+      const past = NOW_ET >= t;
+      const sts = bySlot[t].sort();
+      const nSeats = isSenate ? sts.length : sts.reduce((s, st) => s + (hByState[st] || []).length, 0);
+      return {
+        time: closeParis(t),
+        timeColor: past ? '#141414' : '#8c8a85',
+        lineStyle: 'height: 2px; border-radius: 999px; background: ' + (past ? '#141414' : '#e4e2de') + ';',
+        n: isSenate ? nSeats + ' course' + (nSeats > 1 ? 's' : '') : nSeats + ' siège' + (nSeats > 1 ? 's' : ''),
+        chips: sts.map((st) => {
+          if (isSenate) {
+            const f = sFill(st), pend = f === PENDING;
+            return { t: st, gain: sGain(st), dot: sTxt(st), pick: pickSel('S:' + st), aria: NAMES[st] + ', ' + statusText(sRes[st], HOURS[st][2]),
+              style: 'background: ' + (pend ? '#ffffff' : f) + '; color: ' + sTxt(st) + '; box-shadow: inset 0 0 0 1px ' + (pend ? '#cfccc6' : 'transparent') + (sel === 'S:' + st ? ', 0 0 0 2px #141414' : '') + ';' };
+          }
+          const ids = hByState[st] || [];
+          const dW = ids.filter((id) => hRes[id] && hRes[id].winner === 'D').length, rW = ids.filter((id) => hRes[id] && hRes[id].winner === 'R').length;
+          const done = ids.length && dW + rW === ids.length;
+          const bg = done ? 'linear-gradient(90deg, ' + SOLID.D + ' ' + (dW / ids.length * 100) + '%, ' + SOLID.R + ' 0)' : (dW + rW ? 'linear-gradient(90deg, ' + TINT.D + ' ' + (dW / ids.length * 100) + '%, #ffffff 0, #ffffff ' + (100 - rW / ids.length * 100) + '%, ' + TINT.R + ' 0)' : '#ffffff');
+          return { t: st + ' ' + ids.length, gain: false, dot: '#141414', pick: pickSel('HS:' + st), aria: NAMES[st] + ', ' + ids.length + ' circonscriptions',
+            style: 'background: ' + bg + '; color: ' + (done ? '#ffffff' : '#141414') + '; box-shadow: inset 0 0 0 1px ' + (done ? 'transparent' : '#cfccc6') + (sel === 'HS:' + st ? ', 0 0 0 2px #141414' : '') + ';' };
+        })
+      };
+    });
+
+    // ---------- Textes ----------
+    const before = scenario === 'Avant le scrutin';
+    const dCtrl = dTotal >= majD && !before, rCtrl = rTotal >= majR && !dCtrl && !before;
+    const live = !!feed || scenario === 'Soirée électorale';
+    const updated = feed && feed.updated ? 'Mis à jour ' + feed.updated : (this.state.feedErr ? 'Flux indisponible, nouvel essai…' : before ? 'Premiers résultats le 4 nov. à minuit' : scenario === 'Soirée électorale' ? 'Mis à jour à 04 h 12, heure de Paris' : 'Mis à jour le 5 nov. à 18 h 00');
+    const tabStyle = (on) => 'min-height: 40px; padding: 0 18px; border-radius: 999px; font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; ' + (on ? 'background: #141414; color: #ffffff;' : 'color: #3a3936;');
+    const thumb = (on, key) => ({
+      on, pick: () => this.setState({ chamber: key, sel: null }),
+      style: 'width: 116px; display: flex; flex-direction: column; gap: 8px; padding: 8px; border-radius: 10px; box-sizing: border-box; border: 1.5px solid ' + (on ? '#141414' : '#e9e7e3') + '; opacity: ' + (on ? 1 : .62) + ';',
+      labelStyle: 'font-size: 11px; letter-spacing: .1em; text-transform: uppercase; text-align: center; font-weight: ' + (on ? 600 : 400) + '; color: #141414;'
+    });
+
+    return {
+      tabs: [
+        { label: 'Sénat', on: isSenate, pick: () => this.setState({ chamber: 'S', sel: null }), style: tabStyle(isSenate) },
+        { label: 'Chambre des représentants', on: !isSenate, pick: () => this.setState({ chamber: 'H', sel: null }), style: tabStyle(!isSenate) }
+      ],
+      thumbS: thumb(isSenate, 'S'), thumbH: thumb(!isSenate, 'H'),
+      isSenate, isHouse: !isSenate,
+      headline: isSenate
+        ? (dCtrl ? 'Les démocrates reprennent le Sénat' : rCtrl ? 'Les républicains gardent le Sénat' : 'Sénat : les résultats en direct')
+        : (dCtrl ? 'Les démocrates prennent la Chambre' : rCtrl ? 'Les républicains gardent la Chambre' : 'Chambre : les résultats en direct'),
+      dek: isSenate
+        ? (before ? '35 sièges sur 100 sont en jeu le 3 novembre : 33 élections ordinaires et deux partielles, en Ohio et en Floride. Les républicains détiennent 53 sièges ; les démocrates doivent en gagner quatre de plus pour prendre la majorité.' : '35 sièges sur 100 étaient en jeu. Les républicains détenaient 53 sièges avant le scrutin ; les démocrates devaient en gagner quatre de plus pour prendre la majorité.')
+        : (before ? 'Les 435 sièges de la Chambre sont renouvelés le 3 novembre. Au 2 septembre, les républicains en détenaient 218, les démocrates 214 et un indépendant 1, avec deux sièges vacants. La majorité est à 218.' : 'Les 435 sièges de la Chambre étaient renouvelés. Au 2 septembre, les républicains en détenaient 218, les démocrates 214 et un indépendant 1, avec deux sièges vacants. La majorité est à 218.'),
+      showMockTag: !feed,
+      liveCls: live ? 'live' : '', liveDot: live ? '#e85462' : '#b9b6b0', updatedLabel: updated,
+      dTotal, rTotal,
+      dCheck: dCtrl ? '✓' : '', rCheck: rCtrl ? '✓' : '',
+      dVotes: T.dV ? this.fmtN(T.dV) + ' voix' : '—', rVotes: T.rV ? this.fmtN(T.rV) + ' voix' : '—',
+      pendingLabel: before ? (isSenate ? '35 sièges en jeu' : '435 sièges en jeu') : (undec > 0 ? undec + ' sièges non attribués' : ''),
+      markLabel: markAt + ' SIÈGES',
+      markStyle: 'position: absolute; left: ' + mPct + '%; bottom: 2px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 2px;',
+      markLine: 'position: absolute; left: ' + mPct + '%; top: -5px; bottom: -5px; width: 2px; margin-left: -1px; background: #141414;',
+      pills, barAria: 'Démocrates ' + dTotal + ' sièges, républicains ' + rTotal + ' sièges, ' + undec + ' non attribués',
+      legendParties: [
+        { name: 'Dém.', tint: TINT.D, solid: SOLID.D },
+        { name: 'Rép.', tint: TINT.R, solid: SOLID.R },
+        { name: 'Ind.', tint: TINT.I, solid: SOLID.I }
+      ],
+      mapTitle: isSenate ? 'Les 35 courses' : 'Les 435 circonscriptions',
+      mapHint: isSenate ? 'Cliquez sur un État' : 'Cliquez sur une circonscription',
+      geoReady: !!geo, states, labels, callouts, coLines, miniS,
+      selD: sel && sel.startsWith('S:') && geo && geo.states[sel.slice(2)] ? geo.states[sel.slice(2)].d : '',
+      cells, miniH, hLabels, hAspect, hView, hOutline: house ? house.outline : '',
+      hasSel: !!selV, hasStateSel: !!stSel, noSel: !selV && !stSel,
+      sel: selV || { cands: [], hours: [], hasBack: false }, stSel: stSel || { rows: [] },
+      clearSel: () => this.setState({ sel: null }),
+      watch, slots,
+      sourceLine: 'Source : ' + (feed ? 'Associated Press' : 'données fictives (maquette)') + ' · Graphique : Le Grand Continent',
+      ruleLine: isSenate
+        ? 'Il faut 51 sièges pour la majorité ; à 50-50, la voix du vice-président J. D. Vance revient aux républicains. Les deux indépendants hors scrutin, qui siègent avec les démocrates, sont comptés avec eux.'
+        : 'Il faut 218 sièges pour la majorité. Sièges sortants : House Press Gallery (2 septembre 2026) et 270toWin ; les deux sièges vacants (Floride et Texas) sont attribués à leur ancien parti.'
+    };
+  }
+}
+
+</script>
+<script>
+(function () {
+  const esc = (v) => String(v == null ? '' : v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const map = { avant: 'Avant le scrutin', soiree: 'Soirée électorale', final: 'Résultats définitifs' };
+  const q = new URLSearchParams(location.search);
+  const props = {
+    scenario: map[q.get('scenario')] || 'Soirée électorale',
+    startChamber: q.get('chambre') === 'chambre' || q.get('chamber') === 'house' ? 'Chambre' : 'Sénat',
+    feedUrl: q.get('feed') || '',
+    pollSeconds: +q.get('poll') || 60
+  };
+  // Les fichiers de la carte sont servis à côté de la page
+  const BLOBS = { '/_blob/887bfdd2f68fc724fc9240ab6081605d': 'senat-geo.json', '/_blob/a5181f4bc6ab58c64da7f009f2a1becd': 'house-grid.json' };
+  const realFetch = window.fetch.bind(window);
+  window.fetch = (u, o) => realFetch(typeof u === 'string' && BLOBS[u] ? BLOBS[u] : u, o);
+  const comp = new Component(props);
+
+  let handlers = {};
+  const h = (fn) => { if (!fn) return ''; const id = 'h' + Object.keys(handlers).length; handlers[id] = fn; return id; };
+  const dotH = (on, c, size) => on ? '<span style="width:' + (size || '6px') + ';height:' + (size || '6px') + ';border-radius:50%;background:' + c + '"></span>' : '';
+  const MONO_S = 'font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#6b6965';
+  const H2 = 'margin:0;font-family:\'GC Sanomat\',Georgia,serif;font-weight:700;font-size:26px;letter-spacing:-.01em';
+  const H3 = 'margin:0;font-family:\'GC Sanomat\',Georgia,serif;font-weight:700;font-size:30px;line-height:1.02;letter-spacing:-.01em';
+  const closeBtn = (fn) => '<button data-h="' + h(fn) + '" aria-label="Fermer le détail" style="flex:none;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#6b6965;margin:-10px -12px 0 0"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"></path></svg></button>';
+  const rowBtn = (w, small) => '<button class="row" data-h="' + h(w.pick) + '" aria-label="' + esc(w.aria) + '" style="width:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:' + (small ? 6 : 7) + 'px;padding:' + (small ? '10px 8px' : '12px 8px') + ';' + (small ? '' : 'margin:0 -8px;width:calc(100% + 16px);') + 'border-bottom:1px solid #efedea;border-radius:6px;text-align:left;min-height:44px"><span style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><span' + (small ? ' class="mono" style="font-weight:600;font-size:12.5px"' : ' style="font-weight:600;font-size:15px"') + '>' + esc(w.name + w.gainMark) + '</span><span class="mono" style="font-size:11px;color:' + w.statusColor + '">' + esc(w.status) + '</span></span><span aria-hidden="true" style="display:flex;gap:3px;height:' + (small ? 6 : 8) + 'px"><span style="' + w.aStyle + '"></span><span style="flex:1 1 0;border-radius:999px;background:#f0eeea"></span><span style="' + w.bStyle + '"></span></span>' + (small ? '' : '<span class="mono" style="display:flex;justify-content:space-between;font-size:11.5px;color:#5c5a56"><span>' + esc(w.a) + '</span><span>' + esc(w.b) + '</span></span>') + '</button>';
+
+  window.__render = function () {
+    handlers = {};
+    const v = comp.renderVals();
+    const tabs = v.tabs.map((t) => '<button class="seg" role="tab" aria-selected="' + t.on + '" data-h="' + h(t.pick) + '" style="' + t.style + '">' + t.label + '</button>').join('');
+    const pills = v.pills.map((g) => '<span class="pill" title="' + esc(g.title) + '" style="' + g.style + '"></span>').join('');
+    const legend = v.legendParties.map((p) => '<div style="display:grid;grid-template-columns:auto 54px 54px;row-gap:6px;align-items:center"><span></span><span style="text-align:center">En tête</span><span style="text-align:center">Gagné</span><span style="padding-right:8px">' + p.name + '</span><span style="height:12px;border-radius:999px 0 0 999px;background:' + p.tint + '"></span><span style="height:12px;border-radius:0 999px 999px 0;background:' + p.solid + '"></span></div>').join('');
+    const slots = v.slots.map((s) => '<div style="flex:1 0 92px;display:flex;flex-direction:column;gap:10px"><span style="' + s.lineStyle + '"></span><span style="display:flex;flex-direction:column;gap:1px"><span class="mono" style="font-size:17px;font-weight:500;color:' + s.timeColor + '">' + s.time + '</span><span class="mono" style="font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#6b6965">' + s.n + '</span></span><span style="display:flex;flex-wrap:wrap;gap:5px">' + s.chips.map((c) => '<button class="co" data-h="' + h(c.pick) + '" aria-label="' + esc(c.aria) + '" style="position:static;transform:none;min-height:26px;' + c.style + '">' + c.t + dotH(c.gain, c.dot) + '</button>').join('') + '</span></div>').join('');
+
+    const thumbs = '<div aria-label="Changer de carte" style="flex:0 0 116px;display:flex;flex-wrap:wrap;gap:14px">'
+      + '<button class="thumb" aria-pressed="' + v.thumbS.on + '" data-h="' + h(v.thumbS.pick) + '" style="' + v.thumbS.style + '"><span style="display:block;position:relative;width:100%;aspect-ratio:975/610"><svg aria-hidden="true" viewBox="0 0 975 610" style="position:absolute;inset:0;width:100%;height:100%">' + v.miniS.map((m) => '<path d="' + m.d + '" fill="' + m.fill + '" stroke="#fff" stroke-width="3"></path>').join('') + '</svg></span><span class="mono" style="' + v.thumbS.labelStyle + '">Sénat</span></button>'
+      + '<button class="thumb" aria-pressed="' + v.thumbH.on + '" data-h="' + h(v.thumbH.pick) + '" style="' + v.thumbH.style + '"><span style="display:block;position:relative;width:100%;aspect-ratio:' + v.hAspect + '">' + v.miniH.map((m) => '<span style="' + m.style + '"></span>').join('') + '</span><span class="mono" style="' + v.thumbH.labelStyle + '">Chambre</span></button></div>';
+
+    let mapHtml;
+    if (v.isSenate) {
+      mapHtml = '<div style="flex:1 1 480px;min-width:0;position:relative;aspect-ratio:975/610">' + (v.geoReady
+        ? v.states.map((s) => '<button class="st"' + (s.disabled ? ' disabled' : '') + ' data-h="' + h(s.pick) + '" aria-label="' + esc(s.aria) + '"><svg viewBox="0 0 975 610"><path d="' + s.d + '" fill="' + s.fill + '" stroke="' + s.stroke + '" stroke-width="' + s.sw + '" stroke-linejoin="round"></path></svg></button>').join('')
+          + '<svg aria-hidden="true" viewBox="0 0 975 610" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><path d="' + v.selD + '" fill="none" stroke="#141414" stroke-width="2.5" stroke-linejoin="round"></path>' + v.coLines.map((l) => '<path d="' + l.d + '" fill="none" stroke="#141414" stroke-width=".8"></path>').join('') + '</svg>'
+          + v.labels.map((l) => '<span class="lbl" style="' + l.style + '">' + l.t + dotH(l.gain, l.dot) + '</span>').join('')
+          + v.callouts.map((c) => '<button class="co" data-h="' + h(c.pick) + '" aria-label="' + esc(c.aria) + '" style="' + c.style + '">' + c.t + dotH(c.gain, c.dot) + '</button>').join('')
+        : '<div class="mono" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;' + MONO_S + '">Chargement de la carte…</div>') + '</div>';
+    } else {
+      mapHtml = '<div style="flex:1 1 480px;min-width:0;display:flex;flex-direction:column;gap:10px"><div style="position:relative;width:100%;aspect-ratio:' + v.hAspect + '">'
+        + v.cells.map((c) => '<button class="cell" data-h="' + h(c.pick) + '" aria-label="' + esc(c.aria) + '" style="' + c.style + '">' + dotH(c.gain, c.dot, '32%') + '</button>').join('')
+        + '<svg aria-hidden="true" viewBox="' + v.hView + '" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><path d="' + v.hOutline + '" fill="none" stroke="#141414" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linecap="square"></path></svg>'
+        + v.hLabels.map((l) => '<span class="hlbl" style="' + l.style + '">' + l.t + '</span>').join('')
+        + '</div><span style="font-size:13.5px;color:#5c5a56">Chaque carré représente une circonscription, regroupée par État ; sa position dans l’État est indicative.</span></div>';
+    }
+
+    let panel = '';
+    if (v.hasSel) {
+      const s = v.sel;
+      panel = '<div style="display:flex;flex-direction:column;gap:16px;border:1px solid #e9e7e3;border-radius:14px;padding:20px 20px 18px">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div style="display:flex;flex-direction:column;gap:6px"><span class="mono" style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#6b6965">' + esc(s.kicker) + '</span><h3 style="' + H3 + '">' + esc(s.name) + '</h3></div>' + closeBtn(v.clearSel) + '</div>'
+        + '<span class="mono" style="align-self:flex-start;font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;border-radius:999px;' + s.badgeStyle + '">' + esc(s.status) + '</span>'
+        + '<ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px">' + s.cands.map((c) => '<li style="display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><span style="display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font-weight:600;font-size:15.5px">' + esc(c.check + c.n + c.star) + '</span><span class="mono" style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:' + c.text + '">' + c.p + '</span></span><span style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;flex:none"><span class="mono" style="font-size:20px;font-weight:500;color:' + c.text + '">' + c.pct + '</span><span class="mono" style="font-size:11.5px;color:#6b6965">' + c.v + '</span></span></div><span aria-hidden="true" style="display:block;height:8px;border-radius:999px;background:#f0eeea"><span style="display:block;height:8px;border-radius:999px;' + c.barStyle + '"></span></span></li>').join('') + '</ul>'
+        + '<div style="display:flex;flex-direction:column;gap:8px;padding-top:14px;border-top:1px solid #efedea"><div class="mono" style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px;color:#3a3936"><span>' + esc(s.eevpLabel) + '</span><span style="color:#6b6965">* Sortant</span></div><div aria-hidden="true" style="height:4px;border-radius:999px;background:#f0eeea"><div style="height:4px;border-radius:999px;background:#141414;width:' + s.eevpW + '"></div></div>'
+        + (s.note ? '<span style="font-size:13.5px;line-height:1.45;color:#5c5a56">' + esc(s.note) + '</span>' : '')
+        + '<dl class="mono" style="margin:4px 0 0;display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:11.5px">' + s.hours.map((x) => '<dt style="color:#6b6965">' + x.k + '</dt><dd style="margin:0;text-align:right">' + x.v + '</dd>').join('') + '</dl>'
+        + (s.hasBack ? '<button class="mono" data-h="' + h(s.back) + '" style="align-self:flex-start;min-height:36px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid #141414">← Toutes les circonscriptions de l’État</button>' : '')
+        + '</div></div>';
+    } else if (v.hasStateSel) {
+      const s = v.stSel;
+      panel = '<div style="display:flex;flex-direction:column;gap:14px;border:1px solid #e9e7e3;border-radius:14px;padding:20px 20px 10px">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div style="display:flex;flex-direction:column;gap:6px"><span class="mono" style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#6b6965">' + esc(s.kicker) + '</span><h3 style="' + H3 + '">' + esc(s.name) + '</h3></div>' + closeBtn(v.clearSel) + '</div>'
+        + '<div class="mono" style="display:flex;gap:18px;font-size:12px"><span style="color:#1f6fc4">Dém. ' + s.d + '</span><span style="color:#c62f3f">Rép. ' + s.r + '</span><span style="color:#6b6965">Non tranché ' + s.u + '</span></div>'
+        + '<div style="max-height:460px;overflow-y:auto">' + s.rows.map((w) => rowBtn(w, true)).join('') + '</div></div>';
+    } else {
+      panel = '<div style="display:flex;flex-direction:column;gap:2px"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding-bottom:8px;border-bottom:1px solid #141414"><h3 style="margin:0;font-family:\'GC Sanomat\',Georgia,serif;font-weight:700;font-size:22px">Les courses à suivre</h3><span class="mono" style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#6b6965">Dépouillé</span></div>'
+        + v.watch.map((w) => rowBtn(w, false)).join('') + '</div>';
+    }
+
+    const legend2 = (v.isSenate ? '<span style="display:inline-flex;align-items:center;gap:8px"><span style="width:16px;height:16px;box-sizing:border-box;border:1px solid #8c8a85;background:repeating-linear-gradient(-45deg,#b9b6b0 0 1px,transparent 1px 4px)"></span>Pas d’élection</span><span style="display:inline-flex;align-items:center;gap:8px"><span style="width:32px;height:12px;border-radius:999px;background:repeating-linear-gradient(-45deg,#3b8ee6 0 3px,#fff 3px 6px)"></span>Hors scrutin</span>' : '')
+      + '<span style="display:inline-flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:2px;background:#dcd9d4"></span>Pas encore de résultat</span><span>* Sortant</span><span>✓ Vainqueur</span><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#141414"></span>Gain</span>';
+
+    document.getElementById('app').innerHTML =
+      '<div style="background:#fff;color:#141414;font-family:\'GC National\',Georgia,serif;font-size:16px;line-height:1.45"><div style="max-width:1200px;margin:0 auto;padding:32px clamp(16px,3vw,40px) 56px;box-sizing:border-box">'
+      + '<header style="display:flex;flex-direction:column;gap:14px;padding-bottom:26px"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 24px"><span class="mono" style="font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase">États-Unis · Mi-mandat · 3 novembre 2026</span><span class="mono" style="display:inline-flex;align-items:center;gap:9px;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:#5c5a56;border:1px solid #e4e2de;border-radius:999px;padding:6px 12px"><span class="' + v.liveCls + '" style="width:7px;height:7px;border-radius:50%;background:' + v.liveDot + '"></span>' + esc(v.updatedLabel) + '</span></div>'
+      + '<h1 style="margin:0;font-family:\'GC Sanomat\',Georgia,serif;font-weight:700;font-size:clamp(36px,5.2vw,62px);line-height:1;letter-spacing:-.02em;max-width:20ch">' + esc(v.headline) + '</h1><p style="margin:0;max-width:64ch;font-size:18px;line-height:1.5;color:#3a3936">' + esc(v.dek) + '</p>'
+      + (v.showMockTag ? '<span class="mono" style="align-self:flex-start;font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#7a5600;background:#fbefcc;border-radius:999px;padding:4px 10px">Maquette · résultats fictifs</span>' : '') + '</header>'
+      + '<div role="tablist" aria-label="Choisir l’assemblée" class="mono" style="display:inline-flex;padding:4px;border-radius:999px;background:#f0eeea;margin-bottom:22px">' + tabs + '</div>'
+      + '<section aria-label="Répartition des sièges"><div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px"><div style="display:flex;flex-direction:column;gap:4px"><span class="mono" style="font-size:clamp(40px,5vw,56px);line-height:.9;color:#3b8ee6;letter-spacing:-.02em">' + v.dTotal + '</span><span class="mono" style="font-weight:600;font-size:15px;color:#1f6fc4">Démocrates ' + v.dCheck + '</span></div>'
+      + '<div style="flex:1;position:relative;align-self:stretch"><div class="mono" style="' + v.markStyle + '"><span style="font-size:11.5px;font-weight:500;letter-spacing:.1em;white-space:nowrap">' + v.markLabel + '</span><svg width="10" height="7" viewBox="0 0 10 7" aria-hidden="true"><path d="M0 0h10L5 7z" fill="#141414"></path></svg></div></div>'
+      + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="mono" style="font-size:clamp(40px,5vw,56px);line-height:.9;color:#e85462;letter-spacing:-.02em">' + v.rTotal + '</span><span class="mono" style="font-weight:600;font-size:15px;color:#c62f3f">' + v.rCheck + ' Républicains</span></div></div>'
+      + '<div style="position:relative;height:18px;margin-top:12px"><div role="img" aria-label="' + esc(v.barAria) + '" style="position:absolute;inset:0">' + pills + '</div><div aria-hidden="true" style="' + v.markLine + '"></div></div>'
+      + '<div class="mono" style="display:flex;justify-content:space-between;gap:12px;margin-top:12px;font-size:12px;color:#6b6965"><span>' + v.dVotes + '</span><span style="text-align:center">' + v.pendingLabel + '</span><span style="text-align:right">' + v.rVotes + '</span></div>'
+      + '<div style="display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:30px"><div class="mono" style="display:flex;flex-wrap:wrap;justify-content:center;gap:14px 36px;font-size:11px;letter-spacing:.08em;text-transform:uppercase">' + legend + '</div><div class="mono" style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px 28px;font-size:11px;letter-spacing:.08em;text-transform:uppercase">' + legend2 + '</div></div></section>'
+      + '<section aria-label="Calendrier de la nuit électorale" style="padding-top:34px;margin-top:34px;border-top:1px solid #e9e7e3;display:flex;flex-direction:column;gap:18px"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px"><h2 style="' + H2 + '">La nuit électorale, heure par heure</h2><span class="mono" style="' + MONO_S + '">Premiers résultats attendus · heure de Paris, 4 novembre</span></div><div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px">' + slots + '</div></section>'
+      + '<section style="display:flex;flex-wrap:wrap;gap:28px 40px;padding-top:34px;margin-top:34px;border-top:1px solid #e9e7e3"><div style="flex:999 1 640px;min-width:0;display:flex;flex-direction:column;gap:14px"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px"><h2 style="' + H2 + '">' + v.mapTitle + '</h2><span class="mono" style="' + MONO_S + '">' + v.mapHint + '</span></div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:18px 24px;align-items:flex-start">' + thumbs + mapHtml + '</div>'
+      + (v.isSenate ? '<p style="margin:0;font-size:13.5px;color:#5c5a56">Ohio et Floride : élections partielles pour les sièges laissés par J. D. Vance et Marco Rubio en 2025.</p>' : '') + '</div>'
+      + '<aside style="flex:1 1 320px;min-width:0;max-width:100%;display:flex;flex-direction:column;gap:14px">' + panel + '</aside></section>'
+      + '<footer class="mono" style="margin-top:40px;padding-top:14px;border-top:1px solid #e9e7e3;font-size:11px;line-height:1.6;color:#6b6965;display:flex;flex-direction:column;gap:2px"><span>' + esc(v.sourceLine) + '</span><span>' + esc(v.ruleLine) + '</span><span>Horaires : 2026 Poll Hours Report (mis à jour le 27 octobre 2026), convertis en heure de Paris (UTC+1, soit l’heure de l’Est + 6 h après le passage à l’heure d’hiver aux États-Unis le 1er novembre).</span></footer>'
+      + '</div></div>';
+    const lf = window.__lastFocus;
+    if (lf) { const el = document.querySelector('[aria-label="' + CSS.escape(lf) + '"]'); if (el) el.focus({ preventScroll: true }); }
+  };
+  document.getElementById('app').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-h]'); if (!b) return;
+    window.__lastFocus = b.getAttribute('aria-label');
+    const fn = handlers[b.getAttribute('data-h')]; if (fn) fn();
+  });
+  window.__render();
+  comp.componentDidMount();
+})();
+</script>
+</body>
+</html>
