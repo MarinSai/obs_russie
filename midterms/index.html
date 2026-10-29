@@ -59,7 +59,7 @@ class Component extends DCLogic {
 
   componentDidMount() {
     fetch('/_blob/887bfdd2f68fc724fc9240ab6081605d').then((r) => r.json()).then((g) => this.setState({ geo: g })).catch(() => {});
-    fetch('/_blob/a5181f4bc6ab58c64da7f009f2a1becd').then((r) => r.json()).then((h) => this.setState({ house: h })).catch(() => {});
+    fetch('/_blob/ba0674014de75f742f51b316f4d704aa').then((r) => r.json()).then((h) => this.setState({ house: h })).catch(() => {});
     this.startFeed();
   }
   componentDidUpdate(prev) {
@@ -496,7 +496,7 @@ class Component extends DCLogic {
       geoReady: !!geo, states, labels, callouts, coLines, miniS,
       selD: sel && sel.startsWith('S:') && geo && geo.states[sel.slice(2)] ? geo.states[sel.slice(2)].d : '',
       cells, miniH, hLabels, hAspect, hView, hOutline: house ? house.outline : '',
-      hasSel: !!selV, hasStateSel: !!stSel, noSel: !selV && !stSel,
+      hasSel: !!selV, hasStateSel: !!stSel, noSel: !selV && !stSel, hasPanel: !!selV || !!stSel,
       sel: selV || { cands: [], hours: [], hasBack: false }, stSel: stSel || { rows: [] },
       clearSel: () => this.setState({ sel: null }),
       watch, slots,
@@ -521,7 +521,7 @@ class Component extends DCLogic {
     pollSeconds: +q.get('poll') || 60
   };
   // Les fichiers de la carte sont servis à côté de la page
-  const BLOBS = { '/_blob/887bfdd2f68fc724fc9240ab6081605d': 'senat-geo.json', '/_blob/a5181f4bc6ab58c64da7f009f2a1becd': 'house-grid.json' };
+  const BLOBS = { '/_blob/887bfdd2f68fc724fc9240ab6081605d': 'senat-geo.json', '/_blob/ba0674014de75f742f51b316f4d704aa': 'house-grid.json' };
   const realFetch = window.fetch.bind(window);
   window.fetch = (u, o) => realFetch(typeof u === 'string' && BLOBS[u] ? BLOBS[u] : u, o);
   const comp = new Component(props);
