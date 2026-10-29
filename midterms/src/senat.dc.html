@@ -30,7 +30,10 @@ button:focus-visible,a:focus-visible{outline:2px solid #111;outline-offset:2px}
 .cell:hover{opacity:.72}
 .cell:focus-visible{outline:2px solid #111;outline-offset:1px;z-index:2}
 .lbl{position:absolute;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;letter-spacing:.04em;pointer-events:none;white-space:nowrap;display:flex;align-items:center;gap:3px}
-.hlbl{position:absolute;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:500;letter-spacing:.04em;pointer-events:none;color:#3a3936;white-space:nowrap;line-height:1}
+.hlbl{position:absolute;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;letter-spacing:.02em;pointer-events:none;color:#141414;white-space:nowrap;line-height:1.05;text-align:center;text-shadow:0 0 2px #fff,0 0 2px #fff,0 0 3px #fff}
+.pop{position:absolute;z-index:10;width:min(330px,92%);background:#fff;border:1px solid #e4e2de;border-radius:10px;box-shadow:0 8px 28px rgba(20,20,20,.16);padding:12px 12px 10px;display:flex;flex-direction:column;gap:8px;box-sizing:border-box;text-align:left;line-height:1.3}
+.prow{display:grid;grid-template-columns:minmax(0,1fr) 36px 70px 56px;align-items:center;gap:6px;padding:6px 8px;font-size:13px}
+@media (max-width:600px){.pop{left:4%!important;right:auto!important}}
 .co{position:absolute;transform:translateY(-50%);height:20px;padding:0 7px;border-radius:999px;box-sizing:border-box;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;letter-spacing:.04em;display:flex;align-items:center;gap:3px}
 .co:hover{opacity:.8}
 .row{transition:background .15s}
@@ -174,6 +177,44 @@ button:focus-visible,a:focus-visible{outline:2px solid #111;outline-offset:2px}
               <sc-for list="{{labels}}" as="l" hint-placeholder-count="30"><span class="lbl" style="{{l.style}}">{{l.t}}<sc-if value="{{l.gain}}" hint-placeholder-val="{{ false }}"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{l.dot}};"></span></sc-if></span></sc-for>
               <sc-for list="{{callouts}}" as="c" hint-placeholder-count="5"><button class="co" aria-label="{{c.aria}}" onClick="{{c.pick}}" style="{{c.style}}">{{c.t}}<sc-if value="{{c.gain}}" hint-placeholder-val="{{ false }}"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{c.dot}};"></span></sc-if></button></sc-for>
             </sc-if>
+            <sc-if value="{{hasSel}}" hint-placeholder-val="{{ false }}">
+              <div class="pop" role="dialog" aria-label="{{sel.name}}" style="{{popStyle}}">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                  <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">
+                    <span class="mono" style="font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: #6b6965;">{{sel.kicker}}</span>
+                    <span style="font-family: 'GC Sanomat', Georgia, serif; font-weight: 700; font-size: 18px; line-height: 1.1;">{{sel.name}}</span>
+                  </div>
+                  <button aria-label="Fermer" onClick="{{clearSel}}" style="flex: none; width: 32px; height: 32px; margin: -6px -6px 0 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #6b6965;"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"></path></svg></button>
+                </div>
+                <div>
+                  <div class="prow mono" style="padding-top: 0; padding-bottom: 4px; font-size: 10.5px; letter-spacing: .04em; color: #6b6965; border-bottom: 1px solid #efedea;"><span>Candidat</span><span>Parti</span><span style="text-align: right;">Voix</span><span style="text-align: right;">%</span></div>
+                  <sc-for list="{{sel.cands}}" as="c" hint-placeholder-count="2">
+                    <div class="prow" style="border-bottom: 1px solid #efedea; {{c.rowStyle}}"><span style="font-weight: 600; line-height: 1.2;">{{c.check}}{{c.n}}{{c.star}}</span><span style="font-size: 12px; opacity: .85;">{{c.ps}}</span><span class="mono" style="text-align: right; font-size: 12px;">{{c.vn}}</span><span class="mono" style="text-align: right; font-weight: 600;">{{c.pn}}</span></div>
+                  </sc-for>
+                </div>
+                <div class="mono" style="display: flex; justify-content: space-between; gap: 8px; font-size: 10.5px; color: #6b6965;"><span>{{sel.foot}}</span><span>* Sortant</span></div>
+                <sc-if value="{{sel.hasBack}}" hint-placeholder-val="{{ false }}">
+                  <button class="mono" onClick="{{sel.back}}" style="align-self: flex-start; min-height: 28px; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #141414; border-bottom: 1px solid #141414;">Tout l’État →</button>
+                </sc-if>
+              </div>
+            </sc-if>
+            <sc-if value="{{hasStateSel}}" hint-placeholder-val="{{ false }}">
+              <div class="pop" role="dialog" aria-label="{{stSel.name}}" style="{{popStyle}}">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                  <div style="display: flex; flex-direction: column; gap: 2px;">
+                    <span class="mono" style="font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: #6b6965;">{{stSel.kicker}}</span>
+                    <span style="font-family: 'GC Sanomat', Georgia, serif; font-weight: 700; font-size: 18px; line-height: 1.1;">{{stSel.name}}</span>
+                  </div>
+                  <button aria-label="Fermer" onClick="{{clearSel}}" style="flex: none; width: 32px; height: 32px; margin: -6px -6px 0 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #6b6965;"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"></path></svg></button>
+                </div>
+                <div class="mono" style="display: flex; gap: 14px; font-size: 11.5px;"><span style="color: #1f6fc4;">Dém. {{stSel.d}}</span><span style="color: #c62f3f;">Rép. {{stSel.r}}</span><span style="color: #6b6965;">Non tranché {{stSel.u}}</span></div>
+                <div style="max-height: 210px; overflow-y: auto;">
+                  <sc-for list="{{stSel.rows}}" as="w" hint-placeholder-count="4">
+                    <button class="row mono" onClick="{{w.pick}}" aria-label="{{w.aria}}" style="width: 100%; display: flex; justify-content: space-between; gap: 8px; padding: 7px 4px; border-bottom: 1px solid #efedea; font-size: 11.5px; text-align: left; box-sizing: border-box;"><span style="font-weight: 600;">{{w.name}}{{w.gainMark}}</span><span style="color: {{w.statusColor}};">{{w.status}}</span></button>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
           </div>
         </sc-if>
 
@@ -185,11 +226,49 @@ button:focus-visible,a:focus-visible{outline:2px solid #111;outline-offset:2px}
                 <button class="cell" aria-label="{{c.aria}}" onClick="{{c.pick}}" style="{{c.style}}"><sc-if value="{{c.gain}}" hint-placeholder-val="{{ false }}"><span style="width: 32%; height: 32%; border-radius: 50%; background: {{c.dot}};"></span></sc-if></button>
               </sc-for>
               <svg aria-hidden="true" viewBox="{{hView}}" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;">
-                <path d="{{hOutline}}" fill="none" stroke="#141414" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linecap="square"></path>
+                <path d="{{hOutline}}" fill="none" stroke="#141414" stroke-width="2.4" vector-effect="non-scaling-stroke" stroke-linecap="square"></path>
               </svg>
-              <sc-for list="{{hLabels}}" as="l" hint-placeholder-count="50"><span class="hlbl" style="{{l.style}}">{{l.t}}</span></sc-for>
+              <sc-for list="{{hLabels}}" as="l" hint-placeholder-count="50"><span class="hlbl" style="{{l.style}}">{{l.t}}<br>{{l.n}}</span></sc-for>
+              <sc-if value="{{hasSel}}" hint-placeholder-val="{{ false }}">
+                <div class="pop" role="dialog" aria-label="{{sel.name}}" style="{{popStyle}}">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                    <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">
+                      <span class="mono" style="font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: #6b6965;">{{sel.kicker}}</span>
+                      <span style="font-family: 'GC Sanomat', Georgia, serif; font-weight: 700; font-size: 18px; line-height: 1.1;">{{sel.name}}</span>
+                    </div>
+                    <button aria-label="Fermer" onClick="{{clearSel}}" style="flex: none; width: 32px; height: 32px; margin: -6px -6px 0 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #6b6965;"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"></path></svg></button>
+                  </div>
+                  <div>
+                    <div class="prow mono" style="padding-top: 0; padding-bottom: 4px; font-size: 10.5px; letter-spacing: .04em; color: #6b6965; border-bottom: 1px solid #efedea;"><span>Candidat</span><span>Parti</span><span style="text-align: right;">Voix</span><span style="text-align: right;">%</span></div>
+                    <sc-for list="{{sel.cands}}" as="c" hint-placeholder-count="2">
+                      <div class="prow" style="border-bottom: 1px solid #efedea; {{c.rowStyle}}"><span style="font-weight: 600; line-height: 1.2;">{{c.check}}{{c.n}}{{c.star}}</span><span style="font-size: 12px; opacity: .85;">{{c.ps}}</span><span class="mono" style="text-align: right; font-size: 12px;">{{c.vn}}</span><span class="mono" style="text-align: right; font-weight: 600;">{{c.pn}}</span></div>
+                    </sc-for>
+                  </div>
+                  <div class="mono" style="display: flex; justify-content: space-between; gap: 8px; font-size: 10.5px; color: #6b6965;"><span>{{sel.foot}}</span><span>* Sortant</span></div>
+                  <sc-if value="{{sel.hasBack}}" hint-placeholder-val="{{ false }}">
+                    <button class="mono" onClick="{{sel.back}}" style="align-self: flex-start; min-height: 28px; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #141414; border-bottom: 1px solid #141414;">Tout l’État →</button>
+                  </sc-if>
+                </div>
+              </sc-if>
+              <sc-if value="{{hasStateSel}}" hint-placeholder-val="{{ false }}">
+                <div class="pop" role="dialog" aria-label="{{stSel.name}}" style="{{popStyle}}">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                      <span class="mono" style="font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: #6b6965;">{{stSel.kicker}}</span>
+                      <span style="font-family: 'GC Sanomat', Georgia, serif; font-weight: 700; font-size: 18px; line-height: 1.1;">{{stSel.name}}</span>
+                    </div>
+                    <button aria-label="Fermer" onClick="{{clearSel}}" style="flex: none; width: 32px; height: 32px; margin: -6px -6px 0 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #6b6965;"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"></path></svg></button>
+                  </div>
+                  <div class="mono" style="display: flex; gap: 14px; font-size: 11.5px;"><span style="color: #1f6fc4;">Dém. {{stSel.d}}</span><span style="color: #c62f3f;">Rép. {{stSel.r}}</span><span style="color: #6b6965;">Non tranché {{stSel.u}}</span></div>
+                  <div style="max-height: 210px; overflow-y: auto;">
+                    <sc-for list="{{stSel.rows}}" as="w" hint-placeholder-count="4">
+                      <button class="row mono" onClick="{{w.pick}}" aria-label="{{w.aria}}" style="width: 100%; display: flex; justify-content: space-between; gap: 8px; padding: 7px 4px; border-bottom: 1px solid #efedea; font-size: 11.5px; text-align: left; box-sizing: border-box;"><span style="font-weight: 600;">{{w.name}}{{w.gainMark}}</span><span style="color: {{w.statusColor}};">{{w.status}}</span></button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
             </div>
-            <span style="font-size: 13.5px; color: #5c5a56;">Chaque carré représente une circonscription, regroupée par État ; sa position dans l’État est indicative.</span>
+            <span style="font-size: 13.5px; color: #5c5a56;">Chaque hexagone représente une circonscription, regroupée par État ; sa position dans l’État est indicative.</span>
           </div>
         </sc-if>
       </div>
@@ -198,88 +277,6 @@ button:focus-visible,a:focus-visible{outline:2px solid #111;outline-offset:2px}
       </sc-if>
     </div>
 
-    <!-- Panneau de détail -->
-    <sc-if value="{{hasPanel}}" hint-placeholder-val="{{ false }}"><aside style="flex: 1 1 320px; min-width: 0; max-width: 100%; display: flex; flex-direction: column; gap: 14px;">
-      <sc-if value="{{hasSel}}" hint-placeholder-val="{{ false }}">
-        <div style="display: flex; flex-direction: column; gap: 16px; border: 1px solid #e9e7e3; border-radius: 14px; padding: 20px 20px 18px;">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
-            <div style="display: flex; flex-direction: column; gap: 6px;">
-              <span class="mono" style="font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #6b6965;">{{sel.kicker}}</span>
-              <h3 style="margin: 0; font-family: 'GC Sanomat', Georgia, serif; font-weight: 700; font-size: 30px; line-height: 1.02; letter-spacing: -.01em;">{{sel.name}}</h3>
-            </div>
-            <button aria-label="Fermer le détail" onClick="{{clearSel}}" style="flex: none; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #6b6965; margin: -10px -12px 0 0;">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"></path></svg>
-            </button>
-          </div>
-
-          <span class="mono" style="align-self: flex-start; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: 5px 10px; border-radius: 999px; {{sel.badgeStyle}}">{{sel.status}}</span>
-
-          <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px;">
-            <sc-for list="{{sel.cands}}" as="c" hint-placeholder-count="3">
-              <li style="display: flex; flex-direction: column; gap: 7px;">
-                <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px;">
-                  <span style="display: flex; flex-direction: column; gap: 1px; min-width: 0;">
-                    <span style="font-weight: 600; font-size: 15.5px;">{{c.check}}{{c.n}}{{c.star}}</span>
-                    <span class="mono" style="font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: {{c.text}};">{{c.p}}</span>
-                  </span>
-                  <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 1px; flex: none;">
-                    <span class="mono" style="font-size: 20px; font-weight: 500; color: {{c.text}};">{{c.pct}}</span>
-                    <span class="mono" style="font-size: 11.5px; color: #6b6965;">{{c.v}}</span>
-                  </span>
-                </div>
-                <span aria-hidden="true" style="display: block; height: 8px; border-radius: 999px; background: #f0eeea;"><span style="display: block; height: 8px; border-radius: 999px; {{c.barStyle}}"></span></span>
-              </li>
-            </sc-for>
-          </ul>
-
-          <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 14px; border-top: 1px solid #efedea;">
-            <div class="mono" style="display: flex; justify-content: space-between; gap: 10px; font-size: 11.5px; letter-spacing: .02em; color: #3a3936;">
-              <span>{{sel.eevpLabel}}</span><span style="color: #6b6965;">* Sortant</span>
-            </div>
-            <div aria-hidden="true" style="height: 4px; border-radius: 999px; background: #f0eeea;"><div style="height: 4px; border-radius: 999px; background: #141414; width: {{sel.eevpW}};"></div></div>
-            <span style="font-size: 13.5px; line-height: 1.45; color: #5c5a56;">{{sel.note}}</span>
-            <dl class="mono" style="margin: 4px 0 0; display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; font-size: 11.5px; letter-spacing: .02em;">
-              <sc-for list="{{sel.hours}}" as="h" hint-placeholder-count="2">
-                <dt style="color: #6b6965;">{{h.k}}</dt><dd style="margin: 0; text-align: right; color: #141414;">{{h.v}}</dd>
-              </sc-for>
-            </dl>
-            <sc-if value="{{sel.hasBack}}" hint-placeholder-val="{{ false }}">
-              <button class="mono" onClick="{{sel.back}}" style="align-self: flex-start; min-height: 36px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #141414; border-bottom: 1px solid #141414;">← Toutes les circonscriptions de l’État</button>
-            </sc-if>
-          </div>
-        </div>
-      </sc-if>
-
-      <!-- Vue d'un État (Chambre) -->
-      <sc-if value="{{hasStateSel}}" hint-placeholder-val="{{ false }}">
-        <div style="display: flex; flex-direction: column; gap: 14px; border: 1px solid #e9e7e3; border-radius: 14px; padding: 20px 20px 10px;">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
-            <div style="display: flex; flex-direction: column; gap: 6px;">
-              <span class="mono" style="font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #6b6965;">{{stSel.kicker}}</span>
-              <h3 style="margin: 0; font-family: 'GC Sanomat', Georgia, serif; font-weight: 700; font-size: 30px; line-height: 1.02;">{{stSel.name}}</h3>
-            </div>
-            <button aria-label="Fermer le détail" onClick="{{clearSel}}" style="flex: none; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #6b6965; margin: -10px -12px 0 0;">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"></path></svg>
-            </button>
-          </div>
-          <div class="mono" style="display: flex; gap: 18px; font-size: 12px;">
-            <span style="color: #1f6fc4;">Dém. {{stSel.d}}</span><span style="color: #c62f3f;">Rép. {{stSel.r}}</span><span style="color: #6b6965;">Non tranché {{stSel.u}}</span>
-          </div>
-          <div style="max-height: 460px; overflow-y: auto; margin: 0 -8px;">
-            <sc-for list="{{stSel.rows}}" as="w" hint-placeholder-count="6">
-              <button class="row" onClick="{{w.pick}}" aria-label="{{w.aria}}" style="width: 100%; display: flex; flex-direction: column; gap: 6px; padding: 10px 8px; border-bottom: 1px solid #efedea; border-radius: 6px; text-align: left; min-height: 44px; box-sizing: border-box;">
-                <span style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px;">
-                  <span class="mono" style="font-weight: 600; font-size: 12.5px;">{{w.name}}{{w.gainMark}}</span>
-                  <span class="mono" style="font-size: 11px; color: {{w.statusColor}};">{{w.status}}</span>
-                </span>
-                <span aria-hidden="true" style="display: flex; gap: 3px; height: 6px;"><span style="{{w.aStyle}}"></span><span style="flex: 1 1 0; border-radius: 999px; background: #f0eeea;"></span><span style="{{w.bStyle}}"></span></span>
-              </button>
-            </sc-for>
-          </div>
-        </div>
-      </sc-if>
-
-    </aside></sc-if>
   </section>
 
   <!-- Calendrier de la nuit -->
@@ -321,7 +318,7 @@ class Component extends DCLogic {
 
   componentDidMount() {
     fetch('/_blob/887bfdd2f68fc724fc9240ab6081605d').then((r) => r.json()).then((g) => this.setState({ geo: g })).catch(() => {});
-    fetch('/_blob/ba0674014de75f742f51b316f4d704aa').then((r) => r.json()).then((h) => this.setState({ house: h })).catch(() => {});
+    fetch('/_blob/ba93beb33d7fdf13da21a8fc3e035859').then((r) => r.json()).then((h) => this.setState({ house: h })).catch(() => {});
     this.startFeed();
   }
   componentDidUpdate(prev) {
@@ -578,18 +575,20 @@ class Component extends DCLogic {
       const W = house.w, H = house.h;
       for (const c of house.cells) {
         const r = hRes[c.id], f = fillOf(r), isSel = sel === 'H:' + c.id;
-        const box = 'left: ' + (c.x / W * 100) + '%; top: ' + (c.y / H * 100) + '%; width: ' + (100 / W) + '%; height: ' + (100 / H) + '%;';
+        const box = house.hex
+          ? 'left: ' + (c.x / W * 100) + '%; top: ' + ((c.y + .5 - house.r) / H * 100) + '%; width: ' + (100 / W) + '%; height: ' + (2 * house.r / H * 100) + '%; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);'
+          : 'left: ' + (c.x / W * 100) + '%; top: ' + (c.y / H * 100) + '%; width: ' + (100 / W) + '%; height: ' + (100 / H) + '%;';
         miniH.push({ style: 'position: absolute; ' + box + ' transform: scale(.82); background: ' + f + ';' });
         if (isSenate) continue;
         cells.push({
           aria: NAMES[c.st] + ', ' + ordinal(c.id) + ' : ' + statusText(r, HOURS[c.st][2]),
           pick: pickSel('H:' + c.id), gain: hGain(c.id), dot: txtOf(r),
-          style: box + ' background: ' + f + '; border: 1.5px solid #ffffff;' + (isSel ? ' box-shadow: inset 0 0 0 2px #141414; z-index: 3;' : '')
+          style: box + ' background: ' + f + ';' + (house.hex ? ' transform: scale(.955);' + (isSel ? ' filter: brightness(.72); z-index: 3;' : '') : ' border: 1.5px solid #ffffff;' + (isSel ? ' box-shadow: inset 0 0 0 2px #141414; z-index: 3;' : ''))
         });
       }
       if (!isSenate) for (const st in house.labels) {
-        const [lx, ly] = house.labels[st];
-        hLabels.push({ t: st, style: 'left: ' + (lx / W * 100) + '%; top: ' + (ly / H * 100) + '%;' });
+        const [lx, ly, ln] = house.labels[st];
+        hLabels.push({ t: st, n: ln ? String(ln) : '', style: 'left: ' + (lx / W * 100) + '%; top: ' + (ly / H * 100) + '%;' });
       }
     }
     const hAspect = house ? house.w + ' / ' + house.h : '46 / 27';
@@ -630,11 +629,15 @@ class Component extends DCLogic {
             n: c.n, star: c.inc ? '*' : '', check: isW ? '✓ ' : '', p: PNAME[c.p] || 'Divers',
             v: pending ? '—' : this.fmtN(c.v) + ' voix', pct: pending ? '—' : this.fmtP(share),
             text: TEXT[c.p] || '#6b6965',
+            ps: ({ D: 'Dém.', R: 'Rép.', I: 'Ind.' })[c.p] || 'Div.',
+            vn: pending ? '—' : this.fmtN(c.v), pn: pending ? '—' : this.fmtP(share),
+            rowStyle: isW ? 'background: ' + SOLID[c.p] + '; color: #ffffff;' : 'box-shadow: inset 3px 0 0 ' + (SOLID[c.p] || '#8c8a85') + ';',
             barStyle: 'width: ' + share + '%; background: ' + (isW || !r.winner ? SOLID[c.p] : TINT[c.p]) + ';'
           };
         }),
         eevpLabel: pending ? 'Aucun résultat pour l’instant' : '≈ ' + r.eevp + ' % des votes attendus dépouillés',
         eevpW: r.eevp + '%',
+        foot: pending ? statusText(r, HOURS[st][2]) : '≈ ' + r.eevp + ' % dépouillé' + (r.winner ? ' · désigné par AP' : ''),
         note: (pending ? '' : (r.winner ? 'Vainqueur désigné par l’Associated Press ; les chiffres évoluent jusqu’à la certification. ' : 'Résultats partiels, course non tranchée. ')) + (extra || ''),
         hours: hoursRows(st),
         hasBack: !!back, back
@@ -662,6 +665,18 @@ class Component extends DCLogic {
       });
       stSel = { name: NAMES[st], kicker: 'Chambre · ' + ids.length + ' circonscription' + (ids.length > 1 ? 's' : ''), d, r, u, rows };
     }
+
+    let ax = 50, ay = 30;
+    if (sel && sel.startsWith('S:')) {
+      const st = sel.slice(2);
+      if (CO_Y[st]) { ax = 930 / 9.75; ay = CO_Y[st] / 6.1; } else if (geo && geo.states[st]) { ax = geo.states[st].cx / 9.75; ay = geo.states[st].cy / 6.1; }
+    } else if (sel && house && sel.startsWith('H:')) {
+      const c = house.cells.find((q) => q.id === sel.slice(2));
+      if (c) { ax = (c.x + .5) / house.w * 100; ay = (c.y + .5) / house.h * 100; }
+    } else if (sel && house && sel.startsWith('HS:') && house.labels[sel.slice(3)]) {
+      const l = house.labels[sel.slice(3)]; ax = l[0] / house.w * 100; ay = l[1] / house.h * 100;
+    }
+    const popStyle = (ax > 55 ? 'right: calc(' + (100 - ax) + '% + 12px);' : 'left: calc(' + ax + '% + 12px);') + (ay > 50 ? ' bottom: calc(' + (100 - ay) + '% - 18px);' : ' top: calc(' + ay + '% - 18px);');
 
     // ---------- Courses à suivre ----------
     const watchRow = (name, r, a, b, gain, pick, resET) => {
@@ -758,7 +773,7 @@ class Component extends DCLogic {
       geoReady: !!geo, states, labels, callouts, coLines, miniS,
       selD: sel && sel.startsWith('S:') && geo && geo.states[sel.slice(2)] ? geo.states[sel.slice(2)].d : '',
       cells, miniH, hLabels, hAspect, hView, hOutline: house ? house.outline : '',
-      hasSel: !!selV, hasStateSel: !!stSel, noSel: !selV && !stSel, hasPanel: !!selV || !!stSel,
+      hasSel: !!selV, hasStateSel: !!stSel, noSel: !selV && !stSel, hasPanel: !!selV || !!stSel, popStyle,
       sel: selV || { cands: [], hours: [], hasBack: false }, stSel: stSel || { rows: [] },
       clearSel: () => this.setState({ sel: null }),
       watch, slots,
