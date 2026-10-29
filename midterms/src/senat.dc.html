@@ -30,7 +30,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #111;outline-offset:2px}
 .cell:hover{opacity:.72}
 .cell:focus-visible{outline:2px solid #111;outline-offset:1px;z-index:2}
 .lbl{position:absolute;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;letter-spacing:.04em;pointer-events:none;white-space:nowrap;display:flex;align-items:center;gap:3px}
-.hlbl{position:absolute;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:600;letter-spacing:.04em;pointer-events:none;color:#141414;background:rgba(255,255,255,.88);border-radius:999px;padding:0 4px;line-height:14px}
+.hlbl{position:absolute;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:500;letter-spacing:.04em;pointer-events:none;color:#3a3936;white-space:nowrap;line-height:1}
 .co{position:absolute;transform:translateY(-50%);height:20px;padding:0 7px;border-radius:999px;box-sizing:border-box;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;letter-spacing:.04em;display:flex;align-items:center;gap:3px}
 .co:hover{opacity:.8}
 .row{transition:background .15s}
@@ -127,28 +127,6 @@ button:focus-visible,a:focus-visible{outline:2px solid #111;outline-offset:2px}
     </div>
   </section>
 
-  <!-- Calendrier de la nuit -->
-  <section aria-label="Calendrier de la nuit électorale" style="padding-top: 34px; margin-top: 34px; border-top: 1px solid #e9e7e3; display: flex; flex-direction: column; gap: 18px;">
-    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px;">
-      <h2 style="margin: 0; font-family: 'GC Sanomat', Georgia, serif; font-weight: 700; font-size: 26px; letter-spacing: -.01em;">La nuit électorale, heure par heure</h2>
-      <span class="mono" style="font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #6b6965;">Premiers résultats attendus · heure de Paris, 4 novembre</span>
-    </div>
-    <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px;">
-      <sc-for list="{{slots}}" as="s" hint-placeholder-count="9">
-        <div style="flex: 1 0 92px; display: flex; flex-direction: column; gap: 10px;">
-          <span style="{{s.lineStyle}}"></span>
-          <span style="display: flex; flex-direction: column; gap: 1px;">
-            <span class="mono" style="font-size: 17px; font-weight: 500; color: {{s.timeColor}};">{{s.time}}</span>
-            <span class="mono" style="font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #6b6965;">{{s.n}}</span>
-          </span>
-          <span style="display: flex; flex-wrap: wrap; gap: 5px;">
-            <sc-for list="{{s.chips}}" as="c" hint-placeholder-count="4"><button class="co" aria-label="{{c.aria}}" onClick="{{c.pick}}" style="position: static; transform: none; min-height: 26px; {{c.style}}">{{c.t}}<sc-if value="{{c.gain}}" hint-placeholder-val="{{ false }}"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{c.dot}};"></span></sc-if></button></sc-for>
-          </span>
-        </div>
-      </sc-for>
-    </div>
-  </section>
-
   <!-- Carte + panneau -->
   <section style="display: flex; flex-wrap: wrap; gap: 28px 40px; padding-top: 34px; margin-top: 34px; border-top: 1px solid #e9e7e3;">
 
@@ -221,7 +199,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #111;outline-offset:2px}
     </div>
 
     <!-- Panneau de détail -->
-    <aside style="flex: 1 1 320px; min-width: 0; max-width: 100%; display: flex; flex-direction: column; gap: 14px;">
+    <sc-if value="{{hasPanel}}" hint-placeholder-val="{{ false }}"><aside style="flex: 1 1 320px; min-width: 0; max-width: 100%; display: flex; flex-direction: column; gap: 14px;">
       <sc-if value="{{hasSel}}" hint-placeholder-val="{{ false }}">
         <div style="display: flex; flex-direction: column; gap: 16px; border: 1px solid #e9e7e3; border-radius: 14px; padding: 20px 20px 18px;">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
@@ -301,25 +279,29 @@ button:focus-visible,a:focus-visible{outline:2px solid #111;outline-offset:2px}
         </div>
       </sc-if>
 
-      <sc-if value="{{noSel}}" hint-placeholder-val="{{ true }}">
-        <div style="display: flex; flex-direction: column; gap: 2px;">
-          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding-bottom: 8px; border-bottom: 1px solid #141414;">
-            <h3 style="margin: 0; font-family: 'GC Sanomat', Georgia, serif; font-weight: 700; font-size: 22px;">Les courses à suivre</h3>
-            <span class="mono" style="font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #6b6965;">Dépouillé</span>
-          </div>
-          <sc-for list="{{watch}}" as="w" hint-placeholder-count="11">
-            <button class="row" onClick="{{w.pick}}" aria-label="{{w.aria}}" style="display: flex; flex-direction: column; gap: 7px; padding: 12px 8px; margin: 0 -8px; border-bottom: 1px solid #efedea; border-radius: 6px; text-align: left; min-height: 44px;">
-              <span style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px;">
-                <span style="font-weight: 600; font-size: 15px;">{{w.name}}{{w.gainMark}}</span>
-                <span class="mono" style="font-size: 11px; letter-spacing: .04em; color: {{w.statusColor}};">{{w.status}}</span>
-              </span>
-              <span aria-hidden="true" style="display: flex; gap: 3px; height: 8px;"><span style="{{w.aStyle}}"></span><span style="flex: 1 1 0; border-radius: 999px; background: #f0eeea;"></span><span style="{{w.bStyle}}"></span></span>
-              <span class="mono" style="display: flex; justify-content: space-between; font-size: 11.5px; color: #5c5a56;"><span>{{w.a}}</span><span>{{w.b}}</span></span>
-            </button>
-          </sc-for>
+    </aside></sc-if>
+  </section>
+
+  <!-- Calendrier de la nuit -->
+  <section aria-label="Calendrier de la nuit électorale" style="padding-top: 34px; margin-top: 34px; border-top: 1px solid #e9e7e3; display: flex; flex-direction: column; gap: 18px;">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px;">
+      <h2 style="margin: 0; font-family: 'GC Sanomat', Georgia, serif; font-weight: 700; font-size: 26px; letter-spacing: -.01em;">La nuit électorale, heure par heure</h2>
+      <span class="mono" style="font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #6b6965;">Premiers résultats attendus · heure de Paris, 4 novembre</span>
+    </div>
+    <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px;">
+      <sc-for list="{{slots}}" as="s" hint-placeholder-count="9">
+        <div style="flex: 1 0 92px; display: flex; flex-direction: column; gap: 10px;">
+          <span style="{{s.lineStyle}}"></span>
+          <span style="display: flex; flex-direction: column; gap: 1px;">
+            <span class="mono" style="font-size: 17px; font-weight: 500; color: {{s.timeColor}};">{{s.time}}</span>
+            <span class="mono" style="font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #6b6965;">{{s.n}}</span>
+          </span>
+          <span style="display: flex; flex-wrap: wrap; gap: 5px;">
+            <sc-for list="{{s.chips}}" as="c" hint-placeholder-count="4"><button class="co" aria-label="{{c.aria}}" onClick="{{c.pick}}" style="position: static; transform: none; min-height: 26px; {{c.style}}">{{c.t}}<sc-if value="{{c.gain}}" hint-placeholder-val="{{ false }}"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{c.dot}};"></span></sc-if></button></sc-for>
+          </span>
         </div>
-      </sc-if>
-    </aside>
+      </sc-for>
+    </div>
   </section>
 
   <footer class="mono" style="margin-top: 40px; padding-top: 14px; border-top: 1px solid #e9e7e3; font-size: 11px; letter-spacing: .02em; line-height: 1.6; color: #6b6965; display: flex; flex-direction: column; gap: 2px;">
@@ -339,7 +321,7 @@ class Component extends DCLogic {
 
   componentDidMount() {
     fetch('/_blob/887bfdd2f68fc724fc9240ab6081605d').then((r) => r.json()).then((g) => this.setState({ geo: g })).catch(() => {});
-    fetch('/_blob/a5181f4bc6ab58c64da7f009f2a1becd').then((r) => r.json()).then((h) => this.setState({ house: h })).catch(() => {});
+    fetch('/_blob/ba0674014de75f742f51b316f4d704aa').then((r) => r.json()).then((h) => this.setState({ house: h })).catch(() => {});
     this.startFeed();
   }
   componentDidUpdate(prev) {
@@ -776,7 +758,7 @@ class Component extends DCLogic {
       geoReady: !!geo, states, labels, callouts, coLines, miniS,
       selD: sel && sel.startsWith('S:') && geo && geo.states[sel.slice(2)] ? geo.states[sel.slice(2)].d : '',
       cells, miniH, hLabels, hAspect, hView, hOutline: house ? house.outline : '',
-      hasSel: !!selV, hasStateSel: !!stSel, noSel: !selV && !stSel,
+      hasSel: !!selV, hasStateSel: !!stSel, noSel: !selV && !stSel, hasPanel: !!selV || !!stSel,
       sel: selV || { cands: [], hours: [], hasBack: false }, stSel: stSel || { rows: [] },
       clearSel: () => this.setState({ sel: null }),
       watch, slots,

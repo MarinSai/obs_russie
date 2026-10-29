@@ -65,7 +65,7 @@ class DCLogic {
     pollSeconds: +q.get('poll') || 60
   };
   // Les fichiers de la carte sont servis à côté de la page
-  const BLOBS = { '/_blob/887bfdd2f68fc724fc9240ab6081605d': 'senat-geo.json', '/_blob/a5181f4bc6ab58c64da7f009f2a1becd': 'house-grid.json' };
+  const BLOBS = { '/_blob/887bfdd2f68fc724fc9240ab6081605d': 'senat-geo.json', '/_blob/ba0674014de75f742f51b316f4d704aa': 'house-grid.json' };
   const realFetch = window.fetch.bind(window);
   window.fetch = (u, o) => realFetch(typeof u === 'string' && BLOBS[u] ? BLOBS[u] : u, o);
   const comp = new Component(props);
