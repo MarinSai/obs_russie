@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sénat — résultats des élections de mi-mandat 2026 · Le Grand Continent</title>
+<script async src="https://cdn.jsdelivr.net/npm/@iframe-resizer/child@5/index.umd.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+@font-face{font-family:"GC Sanomat";src:url(fonts/sanomat-regular.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"GC Sanomat";src:url(fonts/sanomat-bold.woff2) format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:"GC National";src:url(fonts/national-regular.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"GC National";src:url(fonts/national-semibold.woff2) format("woff2");font-weight:600;font-display:swap}
+body{margin:0;background:#ffffff}
+a{color:#c62f3f}a:hover{color:#8e1a27}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0;margin:0}
+button:focus-visible,a:focus-visible{outline:2px solid #111;outline-offset:2px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.st{position:absolute;inset:0;pointer-events:none;outline:none}
+.st svg{width:100%;height:100%;display:block}
+.st path{pointer-events:visiblePainted;transition:opacity .15s}
+.st:not(:disabled) path{cursor:pointer}
+.st:not(:disabled) path:hover{opacity:.78}
+.st:focus-visible path{stroke:#111;stroke-width:2.5}
+.lbl{position:absolute;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;letter-spacing:.04em;pointer-events:none;white-space:nowrap;display:flex;align-items:center;gap:3px}
+.co{position:absolute;transform:translateY(-50%);height:20px;padding:0 7px;border-radius:999px;box-sizing:border-box;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;letter-spacing:.04em;display:flex;align-items:center;gap:3px}
+.co:hover{opacity:.8}
+.row{transition:background .15s}
+.row:hover{background:#f6f5f2}
+.pill{position:absolute;top:0;height:18px;border-radius:999px;transition:left .6s cubic-bezier(.2,.7,.2,1),width .6s cubic-bezier(.2,.7,.2,1)}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,84,98,.5)}50%{box-shadow:0 0 0 5px rgba(232,84,98,0)}}
+.live{animation:pulse 2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.live{animation:none}.pill{transition:none}}
+</style>
+</head>
+<body>
+<svg aria-hidden="true" style="position:absolute;width:0;height:0"><defs><pattern id="noel" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="5" height="5" fill="#ffffff"></rect><rect width="1" height="5" fill="#d3d0ca"></rect></pattern></defs></svg>
+<div id="app"></div>
+<script>
+// Petit adaptateur : même logique que la maquette du canevas
+class DCLogic {
+  constructor(props) { this.props = props; this.state = {}; }
+  setState(p) { this.state = Object.assign({}, this.state, typeof p === 'function' ? p(this.state) : p); window.__render(); }
+}
+</script>
+<script>
+/*__COMPONENT__*/
+</script>
+<script>
+(function () {
+  const esc = (v) => String(v == null ? '' : v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const map = { avant: 'Avant le scrutin', soiree: 'Soirée électorale', final: 'Résultats définitifs' };
+  const q = new URLSearchParams(location.search);
+  const props = {
+    scenario: map[q.get('scenario')] || 'Soirée électorale',
+    feedUrl: q.get('feed') || '',
+    pollSeconds: +q.get('poll') || 60
+  };
+  const comp = new Component(props);
+  comp.state = Object.assign({}, comp.state);
+  // Les données de la carte sont servies à côté de la page
+  const realFetch = window.fetch.bind(window);
+  window.fetch = (u, o) => realFetch(typeof u === 'string' && u.indexOf('/_blob/') === 0 ? 'senat-geo.json' : u, o);
+  let handlers = {};
+  const h = (fn) => { if (!fn) return ''; const id = 'h' + Object.keys(handlers).length; handlers[id] = fn; return id; };
+  const dotH = (on, c) => on ? '<span class="dot" style="background:' + c + '"></span>' : '';
+
+  window.__render = function () {
+    handlers = {};
+    const v = comp.renderVals();
+    const pills = v.pills.map((g) => '<span class="pill" title="' + esc(g.title) + '" style="' + g.style + '"></span>').join('');
+    const legend = v.legendParties.map((p) => '<div style="display:grid;grid-template-columns:auto 54px 54px;row-gap:6px;align-items:center"><span></span><span style="text-align:center">En tête</span><span style="text-align:center">Gagné</span><span style="padding-right:8px">' + p.name + '</span><span style="height:12px;border-radius:999px 0 0 999px;background:' + p.tint + '"></span><span style="height:12px;border-radius:0 999px 999px 0;background:' + p.solid + '"></span></div>').join('');
+    const slots = v.slots.map((s) => '<div style="flex:1 0 92px;display:flex;flex-direction:column;gap:10px"><span style="' + s.lineStyle + '"></span><span style="display:flex;flex-direction:column;gap:1px"><span class="mono" style="font-size:17px;font-weight:500;color:' + s.timeColor + '">' + s.time + '</span><span class="mono" style="font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#6b6965">' + s.n + '</span></span><span style="display:flex;flex-wrap:wrap;gap:5px">' + s.chips.map((c) => '<button class="co" data-h="' + h(c.pick) + '" aria-label="' + esc(c.aria) + '" style="position:static;transform:none;min-height:26px;' + c.style + '">' + c.t + dotH(c.gain, c.dot) + '</button>').join('') + '</span></div>').join('');
+    let mapHtml;
+    if (v.geoReady) {
+      mapHtml = v.states.map((s) => '<button class="st"' + (s.disabled ? ' disabled' : '') + ' data-h="' + h(s.pick) + '" aria-label="' + esc(s.aria) + '"><svg viewBox="0 0 975 610"><path d="' + s.d + '" fill="' + s.fill + '" stroke="' + s.stroke + '" stroke-width="' + s.sw + '" stroke-linejoin="round"></path></svg></button>').join('')
+        + '<svg aria-hidden="true" viewBox="0 0 975 610" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><path d="' + v.selD + '" fill="none" stroke="#141414" stroke-width="2.5" stroke-linejoin="round"></path>' + v.coLines.map((l) => '<path d="' + l.d + '" fill="none" stroke="#141414" stroke-width=".8"></path>').join('') + '</svg>'
+        + v.labels.map((l) => '<span class="lbl" style="' + l.style + '">' + l.t + dotH(l.gain, l.dot) + '</span>').join('')
+        + v.callouts.map((c) => '<button class="co" data-h="' + h(c.pick) + '" aria-label="' + esc(c.aria) + '" style="' + c.style + '">' + c.t + dotH(c.gain, c.dot) + '</button>').join('');
+    } else mapHtml = '<div class="mono" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#6b6965;font-size:12px;letter-spacing:.08em;text-transform:uppercase">Chargement de la carte…</div>';
+
+    let panel;
+    if (v.hasSel) {
+      const s = v.sel;
+      panel = '<div style="display:flex;flex-direction:column;gap:16px;border:1px solid #e9e7e3;border-radius:14px;padding:20px 20px 18px">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div style="display:flex;flex-direction:column;gap:6px"><span class="mono" style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#6b6965">' + esc(s.kicker) + '</span><h3 style="margin:0;font-family:\'GC Sanomat\',Georgia,serif;font-weight:700;font-size:32px;line-height:1;letter-spacing:-.01em">' + esc(s.name) + '</h3></div>'
+        + '<button data-h="' + h(v.clearSel) + '" aria-label="Fermer le détail" style="flex:none;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#6b6965;margin:-10px -12px 0 0"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"></path></svg></button></div>'
+        + '<span class="mono" style="align-self:flex-start;font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;border-radius:999px;' + s.badgeStyle + '">' + esc(s.status) + '</span>'
+        + '<ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px">' + s.cands.map((c) => '<li style="display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><span style="display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font-weight:600;font-size:15.5px">' + esc(c.check + c.n + c.star) + '</span><span class="mono" style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:' + c.text + '">' + c.p + '</span></span><span style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;flex:none"><span class="mono" style="font-size:20px;font-weight:500;color:' + c.text + '">' + c.pct + '</span><span class="mono" style="font-size:11.5px;color:#6b6965">' + c.v + '</span></span></div><span aria-hidden="true" style="display:block;height:8px;border-radius:999px;background:#f0eeea"><span style="display:block;height:8px;border-radius:999px;' + c.barStyle + '"></span></span></li>').join('') + '</ul>'
+        + '<div style="display:flex;flex-direction:column;gap:8px;padding-top:14px;border-top:1px solid #efedea"><div class="mono" style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px;color:#3a3936"><span>' + esc(s.eevpLabel) + '</span><span style="color:#6b6965">* Sortant</span></div><div aria-hidden="true" style="height:4px;border-radius:999px;background:#f0eeea"><div style="height:4px;border-radius:999px;background:#141414;width:' + s.eevpW + '"></div></div>'
+        + (s.note ? '<span style="font-size:13.5px;line-height:1.45;color:#5c5a56">' + esc(s.note) + '</span>' : '')
+        + '<dl class="mono" style="margin:4px 0 0;display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:11.5px">' + s.hours.map((x) => '<dt style="color:#6b6965">' + x.k + '</dt><dd style="margin:0;text-align:right">' + x.v + '</dd>').join('') + '</dl></div></div>';
+    } else {
+      panel = '<div style="display:flex;flex-direction:column;gap:2px"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding-bottom:8px;border-bottom:1px solid #141414"><h3 style="margin:0;font-family:\'GC Sanomat\',Georgia,serif;font-weight:700;font-size:22px">Les courses à suivre</h3><span class="mono" style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#6b6965">Dépouillé</span></div>'
+        + v.watch.map((w) => '<button class="row" data-h="' + h(w.pick) + '" aria-label="' + esc(w.aria) + '" style="display:flex;flex-direction:column;gap:7px;padding:12px 8px;margin:0 -8px;border-bottom:1px solid #efedea;border-radius:6px;text-align:left;min-height:44px"><span style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><span style="font-weight:600;font-size:15px">' + esc(w.name + w.gainMark) + '</span><span class="mono" style="font-size:11px;color:' + w.statusColor + '">' + esc(w.status) + '</span></span><span aria-hidden="true" style="display:flex;gap:3px;height:8px"><span style="' + w.aStyle + '"></span><span style="flex:1 1 0;border-radius:999px;background:#f0eeea"></span><span style="' + w.bStyle + '"></span></span><span class="mono" style="display:flex;justify-content:space-between;font-size:11.5px;color:#5c5a56"><span>' + esc(w.a) + '</span><span>' + esc(w.b) + '</span></span></button>').join('') + '</div>';
+    }
+
+    const H2 = 'margin:0;font-family:\'GC Sanomat\',Georgia,serif;font-weight:700;font-size:26px;letter-spacing:-.01em';
+    const sub = 'font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#6b6965';
+    document.getElementById('app').innerHTML =
+      '<div style="background:#fff;color:#141414;font-family:\'GC National\',Georgia,serif;font-size:16px;line-height:1.45"><div style="max-width:1200px;margin:0 auto;padding:32px clamp(16px,3vw,40px) 56px;box-sizing:border-box">'
+      + '<header style="display:flex;flex-direction:column;gap:14px;padding-bottom:28px"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 24px"><span class="mono" style="font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase">États-Unis · Mi-mandat · 3 novembre 2026</span><span class="mono" style="display:inline-flex;align-items:center;gap:9px;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:#5c5a56;border:1px solid #e4e2de;border-radius:999px;padding:6px 12px"><span class="' + v.liveCls + '" style="width:7px;height:7px;border-radius:50%;background:' + v.liveDot + '"></span>' + esc(v.updatedLabel) + '</span></div>'
+      + '<h1 style="margin:0;font-family:\'GC Sanomat\',Georgia,serif;font-weight:700;font-size:clamp(36px,5.2vw,62px);line-height:1;letter-spacing:-.02em;max-width:18ch">' + esc(v.headline) + '</h1><p style="margin:0;max-width:64ch;font-size:18px;line-height:1.5;color:#3a3936">' + esc(v.dek) + '</p>'
+      + (v.showMockTag ? '<span class="mono" style="align-self:flex-start;font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#7a5600;background:#fbefcc;border-radius:999px;padding:4px 10px">Maquette · résultats fictifs</span>' : '') + '</header>'
+      + '<section aria-label="Répartition des sièges"><div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px"><div style="display:flex;flex-direction:column;gap:4px"><span class="mono" style="font-size:clamp(40px,5vw,56px);line-height:.9;color:#3b8ee6;letter-spacing:-.02em">' + v.dTotal + '</span><span class="mono" style="font-weight:600;font-size:15px;color:#1f6fc4">Démocrates ' + v.dCheck + '</span></div>'
+      + '<div class="mono" style="display:flex;flex-direction:column;align-items:center;gap:2px;padding-bottom:2px"><span style="font-size:11.5px;font-weight:500;letter-spacing:.1em">50 SIÈGES</span><svg width="10" height="7" viewBox="0 0 10 7" aria-hidden="true"><path d="M0 0h10L5 7z" fill="#141414"></path></svg></div>'
+      + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="mono" style="font-size:clamp(40px,5vw,56px);line-height:.9;color:#e85462;letter-spacing:-.02em">' + v.rTotal + '</span><span class="mono" style="font-weight:600;font-size:15px;color:#c62f3f">' + v.rCheck + ' Républicains</span></div></div>'
+      + '<div style="position:relative;height:18px;margin-top:12px"><div role="img" aria-label="' + esc(v.barAria) + '" style="position:absolute;inset:0">' + pills + '</div><div aria-hidden="true" style="position:absolute;left:50%;top:-5px;bottom:-5px;width:2px;margin-left:-1px;background:#141414"></div></div>'
+      + '<div class="mono" style="display:flex;justify-content:space-between;gap:12px;margin-top:12px;font-size:12px;color:#6b6965"><span>' + v.dVotes + '</span><span style="text-align:center">' + v.pendingLabel + '</span><span style="text-align:right">' + v.rVotes + '</span></div>'
+      + '<div style="display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:30px"><div class="mono" style="display:flex;flex-wrap:wrap;justify-content:center;gap:14px 36px;font-size:11px;letter-spacing:.08em;text-transform:uppercase">' + legend + '</div>'
+      + '<div class="mono" style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px 28px;font-size:11px;letter-spacing:.08em;text-transform:uppercase"><span style="display:inline-flex;align-items:center;gap:8px"><span style="width:16px;height:16px;box-sizing:border-box;border:1px solid #8c8a85;background:repeating-linear-gradient(-45deg,#b9b6b0 0 1px,transparent 1px 4px)"></span>Pas d’élection</span><span style="display:inline-flex;align-items:center;gap:8px"><span style="width:32px;height:12px;border-radius:999px;background:repeating-linear-gradient(-45deg,#3b8ee6 0 3px,#fff 3px 6px)"></span>Hors scrutin</span><span>* Sortant</span><span>✓ Vainqueur</span><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#141414"></span>Gain</span></div></div></section>'
+      + '<section aria-label="Calendrier de la nuit électorale" style="padding-top:34px;margin-top:34px;border-top:1px solid #e9e7e3;display:flex;flex-direction:column;gap:18px"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px"><h2 style="' + H2 + '">La nuit électorale, heure par heure</h2><span class="mono" style="' + sub + '">Premiers résultats attendus · heure de Paris, 4 novembre</span></div><div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px">' + slots + '</div></section>'
+      + '<section style="display:flex;flex-wrap:wrap;gap:28px 44px;padding-top:34px;margin-top:34px;border-top:1px solid #e9e7e3"><div style="flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:14px"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px"><h2 style="' + H2 + '">Les 35 courses</h2><span class="mono" style="' + sub + '">Cliquez sur un État</span></div><div style="position:relative;width:100%;aspect-ratio:975/610">' + mapHtml + '</div><p style="margin:0;font-size:13.5px;color:#5c5a56">Ohio et Floride : élections partielles pour les sièges laissés par J. D. Vance et Marco Rubio en 2025.</p></div>'
+      + '<aside style="flex:1 1 320px;min-width:0;max-width:100%;display:flex;flex-direction:column;gap:14px">' + panel + '</aside></section>'
+      + '<footer class="mono" style="margin-top:40px;padding-top:14px;border-top:1px solid #e9e7e3;font-size:11px;line-height:1.6;color:#6b6965;display:flex;flex-direction:column;gap:2px"><span>' + esc(v.sourceLine) + '</span><span>Il faut 51 sièges pour la majorité ; à 50-50, la voix du vice-président J. D. Vance revient aux républicains. Les deux indépendants hors scrutin, qui siègent avec les démocrates, sont comptés avec eux.</span><span>Horaires : 2026 Poll Hours Report (mis à jour le 27 octobre 2026), convertis en heure de Paris (UTC+1, soit l’heure de l’Est + 6 h après le passage à l’heure d’hiver aux États-Unis le 1er novembre).</span></footer>'
+      + '</div></div>';
+    const prevFocus = document.activeElement && document.activeElement.getAttribute('aria-label');
+    if (prevFocus) { const el = document.querySelector('[aria-label="' + CSS.escape(prevFocus) + '"]'); if (el) el.focus({ preventScroll: true }); }
+  };
+  document.getElementById('app').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-h]'); if (!b) return;
+    const fn = handlers[b.getAttribute('data-h')]; if (fn) fn();
+  });
+  window.__render();
+  comp.componentDidMount();
+})();
+</script>
+</body>
+</html>
