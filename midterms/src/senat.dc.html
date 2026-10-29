@@ -30,7 +30,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #111;outline-offset:2px}
 .cell:hover{opacity:.72}
 .cell:focus-visible{outline:2px solid #111;outline-offset:1px;z-index:2}
 .lbl{position:absolute;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;letter-spacing:.04em;pointer-events:none;white-space:nowrap;display:flex;align-items:center;gap:3px}
-.hlbl{position:absolute;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;letter-spacing:.02em;pointer-events:none;color:#141414;white-space:nowrap;line-height:1.05;text-align:center;text-shadow:0 0 2px #fff,0 0 2px #fff,0 0 3px #fff}
+.hlbl{position:absolute;z-index:5;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;letter-spacing:.02em;pointer-events:none;color:#141414;white-space:nowrap;line-height:1.05;text-align:center;text-shadow:0 0 2px #fff,0 0 2px #fff,0 0 3px #fff}
 .pop{position:absolute;z-index:10;width:min(330px,92%);background:#fff;border:1px solid #e4e2de;border-radius:10px;box-shadow:0 8px 28px rgba(20,20,20,.16);padding:12px 12px 10px;display:flex;flex-direction:column;gap:8px;box-sizing:border-box;text-align:left;line-height:1.3}
 .prow{display:grid;grid-template-columns:minmax(0,1fr) 36px 70px 56px;align-items:center;gap:6px;padding:6px 8px;font-size:13px}
 @media (max-width:600px){.pop{left:4%!important;right:auto!important}}
@@ -225,7 +225,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #111;outline-offset:2px}
               <sc-for list="{{cells}}" as="c" hint-placeholder-count="435">
                 <button class="cell" aria-label="{{c.aria}}" onClick="{{c.pick}}" style="{{c.style}}"><sc-if value="{{c.gain}}" hint-placeholder-val="{{ false }}"><span style="width: 32%; height: 32%; border-radius: 50%; background: {{c.dot}};"></span></sc-if></button>
               </sc-for>
-              <svg aria-hidden="true" viewBox="{{hView}}" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;">
+              <svg aria-hidden="true" viewBox="{{hView}}" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 4;">
                 <path d="{{hOutline}}" fill="none" stroke="#141414" stroke-width="2.4" vector-effect="non-scaling-stroke" stroke-linecap="square"></path>
               </svg>
               <sc-for list="{{hLabels}}" as="l" hint-placeholder-count="50"><span class="hlbl" style="{{l.style}}">{{l.t}}<br>{{l.n}}</span></sc-for>
@@ -406,7 +406,7 @@ class Component extends DCLogic {
     if (scenario === 'Avant le scrutin') eevp = 0;
     else if (scenario === 'Résultats définitifs') eevp = rnd() < .2 ? 96 + Math.floor(rnd() * 4) : 100;
     else {
-      const elapsed = 22 - resET;
+      const elapsed = 23.4 - resET;
       eevp = elapsed < 0 ? 0 : elapsed === 0 ? Math.floor(4 + rnd() * 10) : Math.min(99, Math.floor(18 + elapsed * 22 + rnd() * 14));
     }
     const m = finalMargin + (scenario === 'Soirée électorale' ? (1 - eevp / 100) * (rnd() - .5) * 10 : 0);
@@ -697,7 +697,7 @@ class Component extends DCLogic {
       : (house ? ['IA-02', 'MI-04', 'MI-07', 'MI-10', 'MT-01', 'OH-07', 'OH-09', 'PA-08', 'AZ-01', 'AZ-06', 'CO-08', 'PA-07'].filter((id) => hRes[id]).map((id) => { const st = id.split('-')[0], r = hRes[id]; return watchRow(NAMES[st] + ' · ' + id, r, r.cands[0], r.cands[1], hGain(id), pickSel('H:' + id), HOURS[st][2]); }) : []);
 
     // ---------- Calendrier ----------
-    const NOW_ET = scenario === 'Avant le scrutin' ? 0 : scenario === 'Soirée électorale' ? 22.2 : 99;
+    const NOW_ET = scenario === 'Avant le scrutin' ? 0 : scenario === 'Soirée électorale' ? 23.4 : 99;
     const bySlot = {};
     const slotStates = isSenate ? Object.keys(RACES) : Object.keys(HOURS);
     for (const st of slotStates) { const t = HOURS[st][2]; (bySlot[t] = bySlot[t] || []).push(st); }
@@ -732,7 +732,7 @@ class Component extends DCLogic {
     const before = scenario === 'Avant le scrutin';
     const dCtrl = dTotal >= majD && !before, rCtrl = rTotal >= majR && !dCtrl && !before;
     const live = !!feed || scenario === 'Soirée électorale';
-    const updated = feed && feed.updated ? 'Mis à jour ' + feed.updated : (this.state.feedErr ? 'Flux indisponible, nouvel essai…' : before ? 'Premiers résultats le 4 nov. à minuit' : scenario === 'Soirée électorale' ? 'Mis à jour à 04 h 12, heure de Paris' : 'Mis à jour le 5 nov. à 18 h 00');
+    const updated = feed && feed.updated ? 'Mis à jour ' + feed.updated : (this.state.feedErr ? 'Flux indisponible, nouvel essai…' : before ? 'Premiers résultats le 4 nov. à minuit' : scenario === 'Soirée électorale' ? 'Mis à jour à 05 h 24, heure de Paris' : 'Mis à jour le 5 nov. à 18 h 00');
     const tabStyle = (on) => 'min-height: 40px; padding: 0 18px; border-radius: 999px; font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; ' + (on ? 'background: #141414; color: #ffffff;' : 'color: #3a3936;');
     const thumb = (on, key) => ({
       on, pick: () => this.setState({ chamber: key, sel: null }),
