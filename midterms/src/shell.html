@@ -29,7 +29,10 @@ button:focus-visible,a:focus-visible{outline:2px solid #111;outline-offset:2px}
 .cell{position:absolute;box-sizing:border-box;border-radius:2px;transition:opacity .15s;display:flex;align-items:center;justify-content:center}
 .cell:hover{opacity:.72}
 .cell:focus-visible{outline:2px solid #111;outline-offset:1px;z-index:2}
-.hlbl{position:absolute;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:500;letter-spacing:.04em;pointer-events:none;color:#3a3936;white-space:nowrap;line-height:1}
+.hlbl{position:absolute;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;letter-spacing:.02em;pointer-events:none;color:#141414;white-space:nowrap;line-height:1.05;text-align:center;text-shadow:0 0 2px #fff,0 0 2px #fff,0 0 3px #fff}
+.pop{position:absolute;z-index:10;width:min(330px,92%);background:#fff;border:1px solid #e4e2de;border-radius:10px;box-shadow:0 8px 28px rgba(20,20,20,.16);padding:12px 12px 10px;display:flex;flex-direction:column;gap:8px;box-sizing:border-box;text-align:left;line-height:1.3}
+.prow{display:grid;grid-template-columns:minmax(0,1fr) 36px 70px 56px;align-items:center;gap:6px;padding:6px 8px;font-size:13px}
+@media (max-width:600px){.pop{left:4%!important;right:auto!important}}
 .thumb{transition:border-color .2s,opacity .2s}.thumb:hover{opacity:1!important}
 .row{transition:background .15s}
 .row:hover{background:#f6f5f2}
@@ -65,7 +68,7 @@ class DCLogic {
     pollSeconds: +q.get('poll') || 60
   };
   // Les fichiers de la carte sont servis à côté de la page
-  const BLOBS = { '/_blob/887bfdd2f68fc724fc9240ab6081605d': 'senat-geo.json', '/_blob/ba0674014de75f742f51b316f4d704aa': 'house-grid.json' };
+  const BLOBS = { '/_blob/887bfdd2f68fc724fc9240ab6081605d': 'senat-geo.json', '/_blob/ba93beb33d7fdf13da21a8fc3e035859': 'house-grid.json' };
   const realFetch = window.fetch.bind(window);
   window.fetch = (u, o) => realFetch(typeof u === 'string' && BLOBS[u] ? BLOBS[u] : u, o);
   const comp = new Component(props);
@@ -91,40 +94,37 @@ class DCLogic {
       + '<button class="thumb" aria-pressed="' + v.thumbS.on + '" data-h="' + h(v.thumbS.pick) + '" style="' + v.thumbS.style + '"><span style="display:block;position:relative;width:100%;aspect-ratio:975/610"><svg aria-hidden="true" viewBox="0 0 975 610" style="position:absolute;inset:0;width:100%;height:100%">' + v.miniS.map((m) => '<path d="' + m.d + '" fill="' + m.fill + '" stroke="#fff" stroke-width="3"></path>').join('') + '</svg></span><span class="mono" style="' + v.thumbS.labelStyle + '">Sénat</span></button>'
       + '<button class="thumb" aria-pressed="' + v.thumbH.on + '" data-h="' + h(v.thumbH.pick) + '" style="' + v.thumbH.style + '"><span style="display:block;position:relative;width:100%;aspect-ratio:' + v.hAspect + '">' + v.miniH.map((m) => '<span style="' + m.style + '"></span>').join('') + '</span><span class="mono" style="' + v.thumbH.labelStyle + '">Chambre</span></button></div>';
 
+    let pop = '';
+    const popHead = (kicker, name) => '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="display:flex;flex-direction:column;gap:2px;min-width:0"><span class="mono" style="font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#6b6965">' + esc(kicker) + '</span><span style="font-family:\'GC Sanomat\',Georgia,serif;font-weight:700;font-size:18px;line-height:1.1">' + esc(name) + '</span></div><button aria-label="Fermer" data-h="' + h(v.clearSel) + '" style="flex:none;width:32px;height:32px;margin:-6px -6px 0 0;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#6b6965"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"></path></svg></button></div>';
+    if (v.hasSel) {
+      const s = v.sel;
+      pop = '<div class="pop" role="dialog" aria-label="' + esc(s.name) + '" style="' + v.popStyle + '">' + popHead(s.kicker, s.name)
+        + '<div><div class="prow mono" style="padding-top:0;padding-bottom:4px;font-size:10.5px;letter-spacing:.04em;color:#6b6965;border-bottom:1px solid #efedea"><span>Candidat</span><span>Parti</span><span style="text-align:right">Voix</span><span style="text-align:right">%</span></div>'
+        + s.cands.map((c) => '<div class="prow" style="border-bottom:1px solid #efedea;' + c.rowStyle + '"><span style="font-weight:600;line-height:1.2">' + esc(c.check + c.n + c.star) + '</span><span style="font-size:12px;opacity:.85">' + c.ps + '</span><span class="mono" style="text-align:right;font-size:12px">' + c.vn + '</span><span class="mono" style="text-align:right;font-weight:600">' + c.pn + '</span></div>').join('') + '</div>'
+        + '<div class="mono" style="display:flex;justify-content:space-between;gap:8px;font-size:10.5px;color:#6b6965"><span>' + esc(s.foot) + '</span><span>* Sortant</span></div>'
+        + (s.hasBack ? '<button class="mono" data-h="' + h(s.back) + '" style="align-self:flex-start;min-height:28px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#141414;border-bottom:1px solid #141414">Tout l’État →</button>' : '')
+        + '</div>';
+    } else if (v.hasStateSel) {
+      const s = v.stSel;
+      pop = '<div class="pop" role="dialog" aria-label="' + esc(s.name) + '" style="' + v.popStyle + '">' + popHead(s.kicker, s.name)
+        + '<div class="mono" style="display:flex;gap:14px;font-size:11.5px"><span style="color:#1f6fc4">Dém. ' + s.d + '</span><span style="color:#c62f3f">Rép. ' + s.r + '</span><span style="color:#6b6965">Non tranché ' + s.u + '</span></div>'
+        + '<div style="max-height:210px;overflow-y:auto">' + s.rows.map((w) => '<button class="row mono" data-h="' + h(w.pick) + '" aria-label="' + esc(w.aria) + '" style="width:100%;display:flex;justify-content:space-between;gap:8px;padding:7px 4px;border-bottom:1px solid #efedea;font-size:11.5px;text-align:left;box-sizing:border-box"><span style="font-weight:600">' + esc(w.name + w.gainMark) + '</span><span style="color:' + w.statusColor + '">' + esc(w.status) + '</span></button>').join('') + '</div></div>';
+    }
+
     let mapHtml;
     if (v.isSenate) {
       mapHtml = '<div style="flex:1 1 480px;min-width:0;position:relative;aspect-ratio:975/610">' + (v.geoReady
         ? v.states.map((s) => '<button class="st"' + (s.disabled ? ' disabled' : '') + ' data-h="' + h(s.pick) + '" aria-label="' + esc(s.aria) + '"><svg viewBox="0 0 975 610"><path d="' + s.d + '" fill="' + s.fill + '" stroke="' + s.stroke + '" stroke-width="' + s.sw + '" stroke-linejoin="round"></path></svg></button>').join('')
           + '<svg aria-hidden="true" viewBox="0 0 975 610" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><path d="' + v.selD + '" fill="none" stroke="#141414" stroke-width="2.5" stroke-linejoin="round"></path>' + v.coLines.map((l) => '<path d="' + l.d + '" fill="none" stroke="#141414" stroke-width=".8"></path>').join('') + '</svg>'
           + v.labels.map((l) => '<span class="lbl" style="' + l.style + '">' + l.t + dotH(l.gain, l.dot) + '</span>').join('')
-          + v.callouts.map((c) => '<button class="co" data-h="' + h(c.pick) + '" aria-label="' + esc(c.aria) + '" style="' + c.style + '">' + c.t + dotH(c.gain, c.dot) + '</button>').join('')
+          + v.callouts.map((c) => '<button class="co" data-h="' + h(c.pick) + '" aria-label="' + esc(c.aria) + '" style="' + c.style + '">' + c.t + dotH(c.gain, c.dot) + '</button>').join('') + pop
         : '<div class="mono" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;' + MONO_S + '">Chargement de la carte…</div>') + '</div>';
     } else {
       mapHtml = '<div style="flex:1 1 480px;min-width:0;display:flex;flex-direction:column;gap:10px"><div style="position:relative;width:100%;aspect-ratio:' + v.hAspect + '">'
         + v.cells.map((c) => '<button class="cell" data-h="' + h(c.pick) + '" aria-label="' + esc(c.aria) + '" style="' + c.style + '">' + dotH(c.gain, c.dot, '32%') + '</button>').join('')
-        + '<svg aria-hidden="true" viewBox="' + v.hView + '" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><path d="' + v.hOutline + '" fill="none" stroke="#141414" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linecap="square"></path></svg>'
-        + v.hLabels.map((l) => '<span class="hlbl" style="' + l.style + '">' + l.t + '</span>').join('')
-        + '</div><span style="font-size:13.5px;color:#5c5a56">Chaque carré représente une circonscription, regroupée par État ; sa position dans l’État est indicative.</span></div>';
-    }
-
-    let panel = '';
-    if (v.hasSel) {
-      const s = v.sel;
-      panel = '<div style="display:flex;flex-direction:column;gap:16px;border:1px solid #e9e7e3;border-radius:14px;padding:20px 20px 18px">'
-        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div style="display:flex;flex-direction:column;gap:6px"><span class="mono" style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#6b6965">' + esc(s.kicker) + '</span><h3 style="' + H3 + '">' + esc(s.name) + '</h3></div>' + closeBtn(v.clearSel) + '</div>'
-        + '<span class="mono" style="align-self:flex-start;font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;border-radius:999px;' + s.badgeStyle + '">' + esc(s.status) + '</span>'
-        + '<ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px">' + s.cands.map((c) => '<li style="display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><span style="display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font-weight:600;font-size:15.5px">' + esc(c.check + c.n + c.star) + '</span><span class="mono" style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:' + c.text + '">' + c.p + '</span></span><span style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;flex:none"><span class="mono" style="font-size:20px;font-weight:500;color:' + c.text + '">' + c.pct + '</span><span class="mono" style="font-size:11.5px;color:#6b6965">' + c.v + '</span></span></div><span aria-hidden="true" style="display:block;height:8px;border-radius:999px;background:#f0eeea"><span style="display:block;height:8px;border-radius:999px;' + c.barStyle + '"></span></span></li>').join('') + '</ul>'
-        + '<div style="display:flex;flex-direction:column;gap:8px;padding-top:14px;border-top:1px solid #efedea"><div class="mono" style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px;color:#3a3936"><span>' + esc(s.eevpLabel) + '</span><span style="color:#6b6965">* Sortant</span></div><div aria-hidden="true" style="height:4px;border-radius:999px;background:#f0eeea"><div style="height:4px;border-radius:999px;background:#141414;width:' + s.eevpW + '"></div></div>'
-        + (s.note ? '<span style="font-size:13.5px;line-height:1.45;color:#5c5a56">' + esc(s.note) + '</span>' : '')
-        + '<dl class="mono" style="margin:4px 0 0;display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:11.5px">' + s.hours.map((x) => '<dt style="color:#6b6965">' + x.k + '</dt><dd style="margin:0;text-align:right">' + x.v + '</dd>').join('') + '</dl>'
-        + (s.hasBack ? '<button class="mono" data-h="' + h(s.back) + '" style="align-self:flex-start;min-height:36px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid #141414">← Toutes les circonscriptions de l’État</button>' : '')
-        + '</div></div>';
-    } else if (v.hasStateSel) {
-      const s = v.stSel;
-      panel = '<div style="display:flex;flex-direction:column;gap:14px;border:1px solid #e9e7e3;border-radius:14px;padding:20px 20px 10px">'
-        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div style="display:flex;flex-direction:column;gap:6px"><span class="mono" style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#6b6965">' + esc(s.kicker) + '</span><h3 style="' + H3 + '">' + esc(s.name) + '</h3></div>' + closeBtn(v.clearSel) + '</div>'
-        + '<div class="mono" style="display:flex;gap:18px;font-size:12px"><span style="color:#1f6fc4">Dém. ' + s.d + '</span><span style="color:#c62f3f">Rép. ' + s.r + '</span><span style="color:#6b6965">Non tranché ' + s.u + '</span></div>'
-        + '<div style="max-height:460px;overflow-y:auto">' + s.rows.map((w) => rowBtn(w, true)).join('') + '</div></div>';
+        + '<svg aria-hidden="true" viewBox="' + v.hView + '" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><path d="' + v.hOutline + '" fill="none" stroke="#141414" stroke-width="2.4" vector-effect="non-scaling-stroke" stroke-linecap="square"></path></svg>'
+        + v.hLabels.map((l) => '<span class="hlbl" style="' + l.style + '">' + l.t + (l.n ? '<br>' + l.n : '') + '</span>').join('') + pop
+        + '</div><span style="font-size:13.5px;color:#5c5a56">Chaque hexagone représente une circonscription, regroupée par État ; sa position dans l’État est indicative.</span></div>';
     }
 
     const legend2 = (v.isSenate ? '<span style="display:inline-flex;align-items:center;gap:8px"><span style="width:16px;height:16px;box-sizing:border-box;border:1px solid #8c8a85;background:repeating-linear-gradient(-45deg,#b9b6b0 0 1px,transparent 1px 4px)"></span>Pas d’élection</span><span style="display:inline-flex;align-items:center;gap:8px"><span style="width:32px;height:12px;border-radius:999px;background:repeating-linear-gradient(-45deg,#3b8ee6 0 3px,#fff 3px 6px)"></span>Hors scrutin</span>' : '')
@@ -145,7 +145,7 @@ class DCLogic {
       + '<section style="display:flex;flex-wrap:wrap;gap:28px 40px;padding-top:34px;margin-top:34px;border-top:1px solid #e9e7e3"><div style="flex:999 1 640px;min-width:0;display:flex;flex-direction:column;gap:14px"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px"><h2 style="' + H2 + '">' + v.mapTitle + '</h2><span class="mono" style="' + MONO_S + '">' + v.mapHint + '</span></div>'
       + '<div style="display:flex;flex-wrap:wrap;gap:18px 24px;align-items:flex-start">' + thumbs + mapHtml + '</div>'
       + (v.isSenate ? '<p style="margin:0;font-size:13.5px;color:#5c5a56">Ohio et Floride : élections partielles pour les sièges laissés par J. D. Vance et Marco Rubio en 2025.</p>' : '') + '</div>'
-      + (panel ? '<aside style="flex:1 1 320px;min-width:0;max-width:100%;display:flex;flex-direction:column;gap:14px">' + panel + '</aside>' : '') + '</section>'
+      + '</section>'
       + '<section aria-label="Calendrier de la nuit électorale" style="padding-top:34px;margin-top:34px;border-top:1px solid #e9e7e3;display:flex;flex-direction:column;gap:18px"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px"><h2 style="' + H2 + '">La nuit électorale, heure par heure</h2><span class="mono" style="' + MONO_S + '">Premiers résultats attendus · heure de Paris, 4 novembre</span></div><div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px">' + slots + '</div></section>'
       + '<footer class="mono" style="margin-top:40px;padding-top:14px;border-top:1px solid #e9e7e3;font-size:11px;line-height:1.6;color:#6b6965;display:flex;flex-direction:column;gap:2px"><span>' + esc(v.sourceLine) + '</span><span>' + esc(v.ruleLine) + '</span><span>Horaires : 2026 Poll Hours Report (mis à jour le 27 octobre 2026), convertis en heure de Paris (UTC+1, soit l’heure de l’Est + 6 h après le passage à l’heure d’hiver aux États-Unis le 1er novembre).</span></footer>'
       + '</div></div>';
