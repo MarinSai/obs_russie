@@ -107,9 +107,15 @@ def build_events(rows, errors):
         date = parse_date(d_ev); entree = parse_date(d_en)
         if not date: errors.append(f"{loc} : Date événement illisible « {d_ev} »")
         if not entree: errors.append(f"{loc} : Date entrée illisible « {d_en} »")
-        la, lo = parse_num(lat), parse_num(lon)
-        if la is None or lo is None or not (30 <= la <= 75 and -25 <= lo <= 50):
-            errors.append(f"{loc} : coordonnées invalides (Lat « {lat} », Lon « {lon} »)")
+        # Plusieurs points pour un même événement : valeurs séparées par « ; » (le premier est le point principal)
+        las, los = [parse_num(x) for x in lat.split(";")], [parse_num(x) for x in lon.split(";")]
+        la, lo = las[0], los[0]
+        if len(las) != len(los):
+            errors.append(f"{loc} : {len(las)} latitudes pour {len(los)} longitudes (Lat « {lat} », Lon « {lon} »)")
+        for a_, b_ in zip(las, los):
+            if a_ is None or b_ is None or not (30 <= a_ <= 75 and -25 <= b_ <= 50):
+                errors.append(f"{loc} : coordonnées invalides (Lat « {lat} », Lon « {lon} »)"); break
+        more = [{"lat": a_, "lon": b_} for a_, b_ in zip(las[1:], los[1:]) if a_ is not None and b_ is not None]
         srcs = [s for s in (s1, s2, s3) if s]
         if not srcs: errors.append(f"{loc} : aucune source")
         for s in srcs:
@@ -119,7 +125,7 @@ def build_events(rows, errors):
             errors.append(f"{loc} : Année {annee} ≠ année de la date {date}")
         events.append({"id": id_, "passe": TYPES.get(typ, False), "date": date, "entree": entree, "nom": nom,
                        "seuil": seuil, "cat": cat, "pays": pays, "lieu": lieu, "desc": desc,
-                       "lat": la, "lon": lo, "sources": srcs})
+                       "lat": la, "lon": lo, "sources": srcs, **({"more": more} if more else {})})
     return events
 
 
@@ -151,12 +157,39 @@ def place(events, old):
                 if done: break
         taken.append((px, py))
         e["pos"] = {"eu": [round(px / W * 100, 2), round(py / H * 100, 2)], "raw": raw}
+    # points supplémentaires (même événement, plusieurs lieux)
+    for e in events:
+        if not e.get("more"):
+            continue
+        o = old_by_id.get(e["id"])
+        same = o and [(m["lat"], m["lon"]) for m in o.get("more", [])] == [(m["lat"], m["lon"]) for m in e["more"]] and all(m.get("pos") for m in o["more"])
+        if same:
+            for m, om in zip(e["more"], o["more"]): m["pos"] = om["pos"]
+            for m in e["more"]: taken.append((m["pos"]["eu"][0] * W / 100, m["pos"]["eu"][1] * H / 100))
+            continue
+        for m in e["more"]:
+            x, y = project(m["lat"], m["lon"])
+            raw = [round(x / W * 100, 3), round(y / H * 100, 3)]
+            px, py = x, y
+            if any(math.hypot(px - tx, py - ty) < MIN_DIST for tx, ty in taken):
+                done = False
+                for ring in range(1, 400):
+                    r = ring * 0.5
+                    steps = max(12, int(2 * math.pi * r / 1.5))
+                    for s in range(steps):
+                        a = 2 * math.pi * s / steps
+                        cx, cy = x + r * math.cos(a), y + r * math.sin(a)
+                        if all(math.hypot(cx - tx, cy - ty) >= MIN_DIST for tx, ty in taken):
+                            px, py, done = cx, cy, True; break
+                    if done: break
+            taken.append((px, py))
+            m["pos"] = {"eu": [round(px / W * 100, 2), round(py / H * 100, 2)], "raw": raw}
     return events
 
 
 def ordered(e):
     return {k: e[k] for k in ("id", "passe", "date", "entree", "nom", "seuil", "cat", "pays", "lieu", "desc",
-                              "lat", "lon", "sources", "pos")}
+                              "lat", "lon", "sources", "pos", "more") if k in e}
 
 
 def main():
