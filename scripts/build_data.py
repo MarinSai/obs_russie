@@ -16,7 +16,7 @@ HEADERS = ["ID", "Type", "Année", "Date événement", "Date entrée", "Nom", "S
            "Catégorie", "Pays", "Ville / Région", "Descriptif", "Lat", "Lon",
            "Source 1", "Source 2", "Source 3"]
 SEUILS = {"Non déterminé", "Suspecté", "Attribué", "Confirmé"}
-CATS = {"Sabotage", "Incendie", "Aéronef", "Renseignement", "Ingérence", "Drones"}
+CATS = {"Sabotage", "Incendie", "Aéronef", "Renseignement", "Ingérence", "Drones", "Actions non classifiables"}
 TYPES = {"Nouveau": False, "Passé": True}
 
 # Projection de la carte (stéréographique), ajustée sur les positions du fichier de départ.
