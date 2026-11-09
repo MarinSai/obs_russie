@@ -7,7 +7,7 @@
 - Garde la position sur la carte des événements déjà présents si leurs coordonnées n'ont pas changé ;
   calcule la position des nouveaux, en les écartant des points voisins.
 - Si une seule ligne est invalide, rien n'est écrit et le script échoue (le site garde l'ancienne version).
-- Lit aussi l'onglet « Médias » (MEDIA_CSV_URL, ou la même publication que la base avec gid=MEDIA_GID) :
+- Lit aussi la feuille « Observatoire – Médias » (publiée en CSV, adresse dans MEDIA_CSV_URL) :
   colonnes ID, Fichier, Type, Légende, Crédit ; seules les lignes dont « Fichier » est rempli sont publiées.
 Aucune dépendance : bibliothèque standard uniquement.
 """
@@ -54,22 +54,12 @@ def fetch(url):
     raise SystemExit(f"Impossible de télécharger la feuille : {last}")
 
 
-MEDIA_GID_DEFAULT = "1770012584"  # onglet « Médias » de la feuille « Output guerre hybride »
 MEDIA_TYPES = {"photo": "photo", "video": "vidéo", "vidéo": "vidéo", "satellite": "satellite", "image satellite": "satellite"}
 
 
-def media_url(sheet_url):
-    """Adresse CSV de l'onglet Médias : MEDIA_CSV_URL, sinon celle de la base avec le gid de l'onglet."""
-    u = os.environ.get("MEDIA_CSV_URL", "").strip()
-    if u:
-        return u
-    if not sheet_url.startswith("http"):
-        return ""
-    gid = os.environ.get("MEDIA_GID", MEDIA_GID_DEFAULT)
-    import re
-    if re.search(r"[?&]gid=\d+", sheet_url):
-        return re.sub(r"([?&]gid=)\d+", r"\g<1>" + gid, sheet_url)
-    return sheet_url + ("&" if "?" in sheet_url else "?") + "gid=" + gid
+def media_url():
+    """Adresse CSV publiée de la feuille « Observatoire – Médias » (secret MEDIA_CSV_URL)."""
+    return os.environ.get("MEDIA_CSV_URL", "").strip()
 
 
 def build_media(text, ids, errors):
@@ -259,7 +249,7 @@ def main():
     errors = []
     events = build_events(read_rows(fetch(src), errors), errors)
     media = None
-    murl = os.environ.get("MEDIA_CSV", "") or media_url(src)
+    murl = os.environ.get("MEDIA_CSV", "") or media_url()
     if murl:
         try:
             mtext = fetch(murl)
