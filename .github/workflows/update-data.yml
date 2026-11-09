@@ -25,7 +25,8 @@ jobs:
       - name: Générer observatoire-data.json depuis la feuille
         env:
           SHEET_CSV_URL: ${{ secrets.SHEET_CSV_URL }}
-          MEDIA_CSV_URL: ${{ secrets.MEDIA_CSV_URL }}
+          # Feuille « Observatoire – Médias », publiée en CSV (contenu public : il est affiché sur le site)
+          MEDIA_CSV_URL: ${{ secrets.MEDIA_CSV_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQpvAdYHBBlvQ-1mu4XNg2dkCDGm1LK5bEHoUFw8bqvPZx8SP4eB4by_0ZiD88-1erV-Sz8e4eCIh83/pub?gid=1363703715&single=true&output=csv' }}
         run: python scripts/build_data.py --out observatoire-data.json --summary "$RUNNER_TEMP/summary.txt"
 
       - name: Publier si le fichier a changé
