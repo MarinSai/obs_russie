@@ -7,6 +7,8 @@
 - Garde la position sur la carte des événements déjà présents si leurs coordonnées n'ont pas changé ;
   calcule la position des nouveaux, en les écartant des points voisins.
 - Si une seule ligne est invalide, rien n'est écrit et le script échoue (le site garde l'ancienne version).
+- Lit aussi l'onglet « Médias » (MEDIA_CSV_URL, ou la même publication que la base avec gid=MEDIA_GID) :
+  colonnes ID, Fichier, Type, Légende, Crédit ; seules les lignes dont « Fichier » est rempli sont publiées.
 Aucune dépendance : bibliothèque standard uniquement.
 """
 import argparse, csv, io, json, math, os, sys, time, urllib.request
@@ -50,6 +52,55 @@ def fetch(url):
             last = e
             time.sleep(3 * (i + 1))
     raise SystemExit(f"Impossible de télécharger la feuille : {last}")
+
+
+MEDIA_GID_DEFAULT = "1770012584"  # onglet « Médias » de la feuille « Output guerre hybride »
+MEDIA_TYPES = {"photo": "photo", "video": "vidéo", "vidéo": "vidéo", "satellite": "satellite", "image satellite": "satellite"}
+
+
+def media_url(sheet_url):
+    """Adresse CSV de l'onglet Médias : MEDIA_CSV_URL, sinon celle de la base avec le gid de l'onglet."""
+    u = os.environ.get("MEDIA_CSV_URL", "").strip()
+    if u:
+        return u
+    if not sheet_url.startswith("http"):
+        return ""
+    gid = os.environ.get("MEDIA_GID", MEDIA_GID_DEFAULT)
+    import re
+    if re.search(r"[?&]gid=\d+", sheet_url):
+        return re.sub(r"([?&]gid=)\d+", r"\g<1>" + gid, sheet_url)
+    return sheet_url + ("&" if "?" in sheet_url else "?") + "gid=" + gid
+
+
+def build_media(text, ids, errors):
+    """Renvoie {ID: {src, type, alt, credit, lien}} ou None si l'onglet n'est pas lisible."""
+    if not text or text.lstrip().startswith("<"):
+        return None
+    rows = list(csv.reader(io.StringIO(text)))
+    if not rows:
+        return None
+    head = [h.strip().lower() for h in rows[0]]
+    col = {name: head.index(name) for name in ("id", "fichier", "type", "légende", "crédit", "lien") if name in head}
+    if "id" not in col or "fichier" not in col:
+        print("Onglet Médias : colonnes « ID » et « Fichier » introuvables ; images inchangées.", file=sys.stderr)
+        return None
+    get = lambda r, k: (r[col[k]].strip() if k in col and col[k] < len(r) else "")
+    out = {}
+    for n, r in enumerate(rows[1:], start=2):
+        id_, src = get(r, "id"), get(r, "fichier")
+        if not src:
+            continue  # pas encore d'image pour cette ligne
+        loc = f"Médias, ligne {n} ({id_ or 'sans ID'})"
+        typ = MEDIA_TYPES.get(get(r, "type").lower() or "photo")
+        if not id_: errors.append(f"{loc} : ID manquant"); continue
+        if id_ not in ids: errors.append(f"{loc} : ID inconnu dans la base")
+        if id_ in out: errors.append(f"{loc} : une seule image par événement")
+        if not src.startswith("https://"): errors.append(f"{loc} : Fichier doit être une adresse https:// « {src[:60]} »")
+        if not typ: errors.append(f"{loc} : Type « {get(r, 'type')} » (attendu photo, vidéo ou satellite)")
+        lien = get(r, "lien")
+        out[id_] = {k: v for k, v in (("src", src), ("type", typ or "photo"), ("alt", get(r, "légende")),
+                                      ("credit", get(r, "crédit")), ("lien", lien if lien.startswith("http") else "")) if v}
+    return dict(sorted(out.items()))
 
 
 def parse_date(s):
@@ -207,6 +258,14 @@ def main():
 
     errors = []
     events = build_events(read_rows(fetch(src), errors), errors)
+    media = None
+    murl = os.environ.get("MEDIA_CSV", "") or media_url(src)
+    if murl:
+        try:
+            mtext = fetch(murl)
+        except SystemExit as ex:
+            print(f"Onglet Médias illisible ({ex}) ; images inchangées.", file=sys.stderr); mtext = ""
+        media = build_media(mtext, {e["id"] for e in events}, errors)
     if errors:
         print("La feuille contient %d problème(s) ; rien n'a été écrit :" % len(errors), file=sys.stderr)
         for m in errors[:60]: print(" -", m, file=sys.stderr)
@@ -219,6 +278,8 @@ def main():
     events = [ordered(e) for e in place(events, old)]
     new_json = dict(old_json) if old_json else {}
     new_json["events"] = events
+    if media is not None:
+        new_json["media"] = media
     with open(a.out, "w", encoding="utf-8") as f:
         json.dump(new_json, f, ensure_ascii=False, separators=(",", ":"))
 
@@ -230,6 +291,12 @@ def main():
     if added: lines.append("Ajoutés : " + ", ".join(added))
     if removed: lines.append("Supprimés : " + ", ".join(removed))
     if changed: lines.append("Modifiés : " + ", ".join(changed))
+    om, nm = old_json.get("media", {}), new_json.get("media", {})
+    madd = [i for i in nm if i not in om]; mrem = [i for i in om if i not in nm]
+    mchg = [i for i in nm if i in om and nm[i] != om[i]]
+    if madd: lines.append("Images ajoutées : " + ", ".join(madd))
+    if mrem: lines.append("Images retirées : " + ", ".join(mrem))
+    if mchg: lines.append("Images modifiées : " + ", ".join(mchg))
     msg = "\n".join(lines)
     print(msg)
     if a.summary: open(a.summary, "w", encoding="utf-8").write(msg + "\n")
