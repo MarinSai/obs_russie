@@ -17,7 +17,7 @@ MARKUP = {
     "Carte": ("Mappa", "Mapa"),
     "Chaque hexagone est un événement documenté à partir de la presse et des autorités des pays suivis. Filtrez par type ou par seuil d'attribution, zoomez sur une région, puis ouvrez un événement pour lire le détail et les sources.":
         ("Ogni esagono è un evento documentato a partire dalla stampa e dalle autorità dei paesi monitorati. Filtrate per tipo o per soglia di attribuzione, ingrandite una regione, poi aprite un evento per leggerne i dettagli e le fonti.",
-         "Cada hexágono es un evento documentado a partir de la prensa y de las autoridades de los países seguidos. Filtre por tipo o por umbral de atribución, amplíe una región y abra un evento para leer el detalle y las fuentes."),
+         "Cada hexágono es un suceso documentado a partir de la prensa y de las autoridades de los países seguidos. Filtre por tipo o por umbral de atribución, amplíe una región y abra un suceso para leer el detalle y las fuentes."),
     "Chargement des données…": ("Caricamento dei dati…", "Cargando los datos…"),
     "Envoyer un signalement": ("Invia una segnalazione", "Enviar un aviso"),
     "Fait antérieur au 23 sept.": ("Fatto anteriore al 23 sett.", "Hecho anterior al 23 sept."),
@@ -55,8 +55,8 @@ MARKUP = {
     "Ukraine : guerre de haute intensité": ("Ucraina: guerra ad alta intensità", "Ucrania: guerra de alta intensidad"),
     "Un hexagone par événement, regroupés par semaine. Cliquez sur une semaine pour filtrer la carte, ou sur un hexagone pour l'ouvrir. Les faits antérieurs au 23 septembre n'y figurent pas.":
         ("Un esagono per evento, raggruppati per settimana. Cliccate su una settimana per filtrare la mappa, o su un esagono per aprirlo. I fatti anteriori al 23 settembre non vi figurano.",
-         "Un hexágono por evento, agrupados por semana. Haga clic en una semana para filtrar el mapa, o en un hexágono para abrirlo. Los hechos anteriores al 23 de septiembre no figuran en ella."),
-    "Un événement manque ?": ("Manca un evento?", "¿Falta un evento?"),
+         "Un hexágono por suceso, agrupados por semana. Haga clic en una semana para filtrar el mapa, o en un hexágono para abrirlo. Los hechos anteriores al 23 de septiembre no figuran en ella."),
+    "Un événement manque ?": ("Manca un evento?", "¿Falta un suceso?"),
     "Version bêta": ("Versione beta", "Versión beta"),
     "Voir sur la carte": ("Vedi sulla mappa", "Ver en el mapa"),
     "de sabotage, d’espionnage et de déstabilisation, documentées depuis le 23 septembre 2026.":
@@ -67,8 +67,8 @@ MARKUP = {
     "sur les 30 suivis : les 27 États membres, la Moldavie, le Royaume-Uni et la Norvège.":
         ("sui 30 monitorati: i 27 Stati membri, la Moldavia, il Regno Unito e la Norvegia.",
          "de los 30 seguidos: los 27 Estados miembros, Moldavia, el Reino Unido y Noruega."),
-    "Événements affichés": ("Eventi visualizzati", "Eventos mostrados"),
-    "Événements par semaine": ("Eventi per settimana", "Eventos por semana"),
+    "Événements affichés": ("Eventi visualizzati", "Sucesos mostrados"),
+    "Événements par semaine": ("Eventi per settimana", "Sucesos por semana"),
     "à partir de la presse et des autorités de chaque pays, dans leur langue.":
         ("a partire dalla stampa e dalle autorità di ciascun paese, nella loro lingua.",
          "a partir de la prensa y de las autoridades de cada país, en su idioma."),
@@ -96,11 +96,11 @@ ATTRS = {
 # Chaînes du code (entre apostrophes droites, telles qu'elles figurent dans le script)
 JS = {
     " au total": (" in totale", " en total"),
-    " derniers événements": (" ultimi eventi", " últimos eventos"),
-    " événement affiché": (" evento visualizzato", " evento mostrado"),
-    " événements affichés": (" eventi visualizzati", " eventos mostrados"),
-    " événements": (" eventi", " eventos"),
-    " événements, ": (" eventi, ", " eventos, "),
+    " derniers événements": (" ultimi eventi", " últimos sucesos"),
+    " événement affiché": (" evento visualizzato", " suceso mostrado"),
+    " événements affichés": (" eventi visualizzati", " sucesos mostrados"),
+    " événements": (" eventi", " sucesos"),
+    " événements, ": (" eventi, ", " sucesos, "),
     " par rapport à la précédente)": (" rispetto alla precedente)", " respecto a la anterior)"),
     " pays": (" paesi", " países"),
     "Afficher les ": ("Mostra i ", "Mostrar los "),
@@ -112,7 +112,7 @@ JS = {
         ("Trascinate per spostare; pizzico, doppio clic o Ctrl + rotella per ingrandire", "Arrastre para mover; pellizco, doble clic o Ctrl + rueda para ampliar"),
     "Image satellite": ("Immagine satellitare", "Imagen satelital"),
     "Images à ajouter : ": ("Immagini da aggiungere: ", "Imágenes por añadir: "),
-    "Jour le plus chargé": ("Giorno più intenso", "Día con más eventos"),
+    "Jour le plus chargé": ("Giorno più intenso", "Día con más sucesos"),
     "Jusqu’au ": ("Fino al ", "Hasta el "),
     "Lieu": ("Luogo", "Lugar"),
     "Mettre en pause": ("Metti in pausa", "Pausar"),
@@ -126,12 +126,12 @@ JS = {
     "Replier": ("Chiudi", "Plegar"),
     "Réduire le journal": ("Riduci il registro", "Reducir el registro"),
     "Semaine du ": ("Settimana del ", "Semana del "),
-    "Semaine la plus chargée": ("Settimana più intensa", "Semana con más eventos"),
+    "Semaine la plus chargée": ("Settimana più intensa", "Semana con más sucesos"),
     "Seuil d\\'attribution": ("Soglia di attribuzione", "Umbral de atribución"),
     "Seuil : ": ("Soglia: ", "Umbral: "),
     "Type : ": ("Tipo: ", "Tipo: "),
     "Type": ("Tipo", "Tipo"),
-    "aucun événement": ("nessun evento", "ningún evento"),
+    "aucun événement": ("nessun evento", "ningún suceso"),
     "depuis le 23 sept. 2026": ("dal 23 sett. 2026", "desde el 23 sept. 2026"),
     "semaine du ": ("settimana del ", "semana del "),
     "sur les semaines complètes": ("sulle settimane complete", "en las semanas completas"),
@@ -206,10 +206,10 @@ METHODE = {
    "La guerra rusa contra Europa apunta en primer lugar a los países que prestan apoyo financiero, político y militar a Ucrania, con el fin de debilitar ese apoyo desestabilizando las sociedades europeas. Según el ISW, el Kremlin busca de manera más amplia fracturar la unidad de la OTAN y reafirmar su influencia sobre el espacio postsoviético.",
    "Desde hace varios meses, los servicios de inteligencia europeos alertan sobre una posible escalada de la guerra rusa contra Europa. Varios centros de investigación evocan en particular el escenario de una operación de falsa bandera destinada a «liberar» a las poblaciones rusófonas de la región de Narva, en Estonia. La CIA habría advertido también a España, Francia e Italia de un proyecto ruso de lanzar drones desde buques comerciales en el Mediterráneo."]},
   {"titre": "¿Cómo se recopilan los datos?", "paras": [
-   "Los eventos registrados por el Observatorio proceden de un seguimiento diario de la prensa nacional de los 30 países seguidos, en su lengua original, completado por varias agencias y medios internacionales de referencia. Esta recopilación automatizada, basada en un conjunto de palabras clave propias de cada lengua, va seguida de una verificación y una calificación manuales antes de cualquier incorporación a la base de datos.",
+   "Los sucesos registrados por el Observatorio proceden de un seguimiento diario de la prensa nacional de los 30 países seguidos, en su lengua original, completado por varias agencias y medios internacionales de referencia. Esta recopilación automatizada, basada en un conjunto de palabras clave propias de cada lengua, va seguida de una verificación y una calificación manuales antes de cualquier incorporación a la base de datos.",
    "Este método tiene límites: se apoya en la prensa abierta y no en fuentes clasificadas, por lo que solo puede registrar lo que es público. La revista se esfuerza por reducir estos puntos ciegos, en particular mediante un seguimiento manual regular.",
    "Las operaciones ocurridas antes del 23 de septiembre de 2026, fecha de inicio del seguimiento, se incorporan cuando se revelan o conocen un nuevo desarrollo después de esa fecha. Se señalan como «hechos anteriores» y no figuran en la cronología."]},
-  {"titre": "¿Cómo se clasifican los eventos?", "paras": [
+  {"titre": "¿Cómo se clasifican los sucesos?", "paras": [
    "Las operaciones registradas deben producirse en uno de los 30 países seguidos por el Observatorio, incluidas sus aguas territoriales y sus zonas económicas exclusivas, con excepción de los incidentes ocurridos en Ucrania en las inmediaciones de la frontera con alguno de esos países, en la medida en que afectan directamente a la seguridad del continente.",
    "Las operaciones incluidas en la base de datos se reparten en siete categorías principales: las operaciones aéreas que implican aeronaves (drones civiles o militares, misiles, helicópteros y aviones); los ataques con drones contra buques mercantes; los actos de sabotaje; los incendios provocados; las operaciones de inteligencia y espionaje; las operaciones de injerencia y desestabilización dirigidas contra las instituciones, los representantes políticos o los procesos electorales, incluidas las campañas de desinformación; y las acciones no clasificables, es decir, incidentes muy mediatizados para los que no se ha establecido ningún vínculo con Rusia, pero que podrían formar parte de su campaña (falsas alertas de bomba contra vuelos, ciberataques en serie, etc.).",
    "Cada una de las operaciones registradas se clasifica en una escala que evalúa el umbral de atribución a Rusia, según el modelo del sistema de referencia utilizado por los servicios de inteligencia británicos:"],
