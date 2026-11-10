@@ -29,14 +29,23 @@ jobs:
           MEDIA_CSV_URL: ${{ secrets.MEDIA_CSV_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQpvAdYHBBlvQ-1mu4XNg2dkCDGm1LK5bEHoUFw8bqvPZx8SP4eB4by_0ZiD88-1erV-Sz8e4eCIh83/pub?gid=1363703715&single=true&output=csv' }}
         run: python scripts/build_data.py --out observatoire-data.json --summary "$RUNNER_TEMP/summary.txt"
 
-      - name: Publier si le fichier a changé
+      - name: Traduire en italien et en espagnol (DeepL)
+        env:
+          DEEPL_API_KEY: ${{ secrets.DEEPL_API_KEY }}
         run: |
-          if git diff --quiet -- observatoire-data.json; then
+          python scripts/translate_data.py | tee "$RUNNER_TEMP/tr.txt"
+          { echo; cat "$RUNNER_TEMP/tr.txt"; } >> "$RUNNER_TEMP/summary.txt" || true
+
+      - name: Publier si les fichiers ont changé
+        run: |
+          git add -N observatoire-data-it.json observatoire-data-es.json translations 2>/dev/null || true
+          if git diff --quiet -- observatoire-data.json observatoire-data-it.json observatoire-data-es.json translations; then
             echo "Aucun changement."
             exit 0
           fi
           git config user.name "observatoire-bot"
           git config user.email "observatoire-bot@users.noreply.github.com"
-          git add observatoire-data.json
+          git add observatoire-data.json observatoire-data-it.json observatoire-data-es.json translations
+          [ -s "$RUNNER_TEMP/summary.txt" ] || echo "Données de l'Observatoire : traductions" > "$RUNNER_TEMP/summary.txt"
           git commit -F "$RUNNER_TEMP/summary.txt"
           git pull --rebase origin main && git push || (sleep 5 && git pull --rebase origin main && git push)
