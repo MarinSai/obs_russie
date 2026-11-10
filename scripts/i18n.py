@@ -107,7 +107,6 @@ JS = {
     "Avec les faits antérieurs au 23 sept.": ("Con i fatti anteriori al 23 sett.", "Con los hechos anteriores al 23 sept."),
     "Date": ("Data", "Fecha"),
     "Dernière semaine": ("Ultima settimana", "Última semana"),
-    "Entrée dans la base": ("Inserito nella banca dati", "Incorporado a la base"),
     "Glisser pour déplacer, pincer pour zoomer": ("Trascinate per spostare, pizzicate per ingrandire", "Arrastre para mover, pellizque para ampliar"),
     "Glisser pour déplacer, pincer, double-clic ou Ctrl + molette pour zoomer":
         ("Trascinate per spostare; pizzico, doppio clic o Ctrl + rotella per ingrandire", "Arrastre para mover; pellizco, doble clic o Ctrl + rueda para ampliar"),
