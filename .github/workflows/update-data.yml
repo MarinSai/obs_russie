@@ -38,14 +38,14 @@ jobs:
 
       - name: Publier si les fichiers ont changé
         run: |
-          git add -N observatoire-data-it.json observatoire-data-es.json translations 2>/dev/null || true
-          if git diff --quiet -- observatoire-data.json observatoire-data-it.json observatoire-data-es.json translations; then
+          git add -N observatoire-data-it.json observatoire-data-es.json traductions-it.csv traductions-es.csv translations 2>/dev/null || true
+          if git diff --quiet -- observatoire-data.json observatoire-data-it.json observatoire-data-es.json traductions-it.csv traductions-es.csv translations; then
             echo "Aucun changement."
             exit 0
           fi
           git config user.name "observatoire-bot"
           git config user.email "observatoire-bot@users.noreply.github.com"
-          git add observatoire-data.json observatoire-data-it.json observatoire-data-es.json translations
+          git add observatoire-data.json observatoire-data-it.json observatoire-data-es.json traductions-it.csv traductions-es.csv translations
           [ -s "$RUNNER_TEMP/summary.txt" ] || echo "Données de l'Observatoire : traductions" > "$RUNNER_TEMP/summary.txt"
           git commit -F "$RUNNER_TEMP/summary.txt"
           git pull --rebase origin main && git push || (sleep 5 && git pull --rebase origin main && git push)

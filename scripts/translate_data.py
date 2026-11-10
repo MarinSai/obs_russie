@@ -13,7 +13,7 @@
   et le script ne fait pas échouer la mise à jour.
 Aucune dépendance : bibliothèque standard uniquement.
 """
-import hashlib, json, os, sys, time, urllib.parse, urllib.request
+import csv, hashlib, json, os, sys, time, urllib.parse, urllib.request
 
 LANGS = {"it": "IT", "es": "ES"}
 SRC = "observatoire-data.json"
@@ -129,6 +129,16 @@ def main():
             out["media"] = {k: {**m, "alt": tr(m.get("alt"))} for k, m in src["media"].items()}
         with open(f"observatoire-data-{lang}.json", "w", encoding="utf-8") as f:
             json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
+        # Tableau lisible (français / traduction côte à côte), importable dans Google Sheets avec IMPORTDATA
+        LN = {"it": "IT", "es": "ES"}[lang]
+        with open(f"traductions-{lang}.csv", "w", encoding="utf-8", newline="") as f:
+            w = csv.writer(f)
+            w.writerow(["ID", "Date", "Nom (FR)", f"Nom ({LN})", "Descriptif (FR)", f"Descriptif ({LN})",
+                        "Ville / Région (FR)", f"Ville / Région ({LN})", f"Pays ({LN})"])
+            for e, e2 in sorted(zip(src["events"], evs), key=lambda p: p[0]["date"], reverse=True):
+                w.writerow([e["id"], e["date"], e["nom"], e2["nom"], e["desc"], e2["desc"], e.get("lieu", ""), e2.get("lieu", ""), e2["pays"]])
+            for k, m in (src.get("media") or {}).items():
+                w.writerow([k, "", "Légende du média : " + (m.get("alt") or ""), tr(m.get("alt")), "", "", "", "", ""])
 
     # Le cache ne garde que les textes encore utilisés (évite qu'il grossisse indéfiniment)
     live = set()
