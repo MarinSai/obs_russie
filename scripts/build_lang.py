@@ -46,7 +46,6 @@ def build(lang, k):
     rep("const T2 = 'en Europe';", "const T2 = '" + esc_js(T2) + "';")
     rep("const DATA_URL = '" + DATA_FR + "';", "const DATA_URL = '" + DATA_FR.replace(".json", "-" + lang + ".json") + "';")
     rep('<html lang="fr">', '<html lang="' + lang + '">')
-    rep('>Observatoire de la guerre russe <span class="hl">en Europe</span></span>', '>' + T1 + ' <span class="hl">' + T2 + '</span></span>')
     # Titre plus long qu'en français : un peu plus large et un peu plus petit dans l'ouverture
     rep("font-size: clamp(64px, 11vw, 176px); line-height: .94; letter-spacing: -.03em; max-width: 11ch;",
         "font-size: clamp(54px, 8.6vw, 138px); line-height: .94; letter-spacing: -.03em; max-width: 13.5ch;")

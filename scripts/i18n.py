@@ -86,7 +86,6 @@ ATTRS = {
     "Images suivantes": ("Immagini successive", "Imágenes siguientes"),
     "Jour précédent": ("Giorno precedente", "Día anterior"),
     "Jour suivant": ("Giorno successivo", "Día siguiente"),
-    "Le Grand Continent": ("Il Grand Continent", "El Grand Continent"),
     "Revenir au début de la veille": ("Torna all’inizio del monitoraggio", "Volver al inicio del seguimiento"),
     "Revenir à la vue d'ensemble": ("Torna alla vista d’insieme", "Volver a la vista general"),
     "Types d'action": ("Tipi di azione", "Tipos de acción"),
