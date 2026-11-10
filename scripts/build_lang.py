@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Produit observatoire_IT.html et observatoire_ES.html à partir de observatoire.html (version française).
+"""Produit observatoire_russie_IT.html et observatoire_russie_ES.html à partir de observatoire.html (version française).
 
 À relancer après chaque modification de la page française :  python3 scripts/build_lang.py
 Les textes de l'interface sont dans scripts/i18n.py ; les données traduites (observatoire-data-it.json,
@@ -87,7 +87,7 @@ def build(lang, k):
     # Titre de l'onglet hors gabarit éventuel
     out = out.replace("<title>Observatoire de la guerre russe en Europe</title>", "<title>" + full + "</title>")
     out = out.replace("Observatoire de la guerre russe en Europe", full)
-    path = os.path.join(ROOT, "observatoire_" + lang.upper() + ".html")
+    path = os.path.join(ROOT, "observatoire_russie_" + lang.upper() + ".html")
     open(path, "w", encoding="utf-8").write(out)
     print("écrit", os.path.basename(path))
 
