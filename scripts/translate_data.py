@@ -137,8 +137,11 @@ def main():
                         "Ville / Région (FR)", f"Ville / Région ({LN})", f"Pays ({LN})"])
             for e, e2 in sorted(zip(src["events"], evs), key=lambda p: p[0]["date"], reverse=True):
                 w.writerow([e["id"], e["date"], e["nom"], e2["nom"], e["desc"], e2["desc"], e.get("lieu", ""), e2.get("lieu", ""), e2["pays"]])
+        with open(f"traductions-medias-{lang}.csv", "w", encoding="utf-8", newline="") as f:
+            w = csv.writer(f)
+            w.writerow(["ID", "Type", "Légende (FR)", f"Légende ({LN})", "Crédit", "Fichier"])
             for k, m in (src.get("media") or {}).items():
-                w.writerow([k, "", "Légende du média : " + (m.get("alt") or ""), tr(m.get("alt")), "", "", "", "", ""])
+                w.writerow([k, m.get("type", ""), m.get("alt") or "", tr(m.get("alt")), m.get("credit", ""), m.get("src", "")])
 
     # Le cache ne garde que les textes encore utilisés (évite qu'il grossisse indéfiniment)
     live = set()
