@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Réinsère build/template.html dans le bundle d'origine -> site/observatoire_test.html (même format, mêmes polices et ressources)."""
 import json, re, os, sys
-ROOT = os.environ.get('OBS_WORK', os.path.expanduser('~/work'))
+ROOT = '/home/claude/work'
 src = open(os.path.join(ROOT, 'src/observatoire.html'), encoding='utf-8').read()
 tpl = open(os.path.join(ROOT, 'build/template.html'), encoding='utf-8').read()
 m = re.search(r'(<script type="__bundler/template">)(.*?)(</script>)', src, re.S)

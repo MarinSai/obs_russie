@@ -1,4 +1,4 @@
-import json, re, math, os
+import json, re, math
 from collections import Counter
 PROJ = dict(lon0=13.973, lat0=51.938, scale=2039.565, ox=486.373, oy=386.614)
 def project(lat, lon):
@@ -13,7 +13,7 @@ C = {  # pays (repère interne, jamais affiché) : point d'étiquette, puis poin
  'Pays-Bas': [(52.3,5.7)], 'Pologne': [(52.1,19.3)], 'Portugal': [(39.7,-8.0)], 'Roumanie': [(45.9,24.8)], 'Slovaquie': [(48.7,19.5)], 'Slovénie': [(46.1,14.8)],
  'Suède': [(61.5,15.3),(57.5,18.5)], 'Tchéquie': [(49.8,15.3)], 'Moldavie': [(47.25,28.5)], 'Royaume-Uni': [(52.8,-1.6),(54.6,-6.7)], 'Norvège': [(61.2,9.0)],
 }
-d = json.load(open(os.path.join(os.environ.get('OBS_WORK', os.path.expanduser('~/work')), 'data', 'observatoire-data.json')))
+d = json.load(open('/home/claude/work/data/observatoire-data.json'))
 rings = [[tuple(map(float, p.split(','))) for p in re.findall(r'-?[\d.]+,-?[\d.]+', s)] for s in re.findall(r'M[^M]*', d['land'])]
 def inside(pt, r):
     x, y = pt; c = False

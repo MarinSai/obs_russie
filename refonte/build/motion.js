@@ -109,7 +109,8 @@ function makeTip() {
   const show = el => {
     const s = el.getAttribute('aria-label') || '', i = s.indexOf(' — ');
     if (i < 0) { hide(); return; }
-    cur = el; lab = s; d.textContent = s.slice(0, i); t.textContent = s.slice(i + 3);
+    const j = s.lastIndexOf(' — '), meta = j > i ? s.slice(j + 3) : '';
+    cur = el; lab = s; d.textContent = s.slice(0, i) + (meta ? ' · ' + meta : ''); t.textContent = j > i ? s.slice(i + 3, j) : s.slice(i + 3);
     const r = el.getBoundingClientRect(), W = document.documentElement.clientWidth;
     tip.style.maxWidth = Math.min(300, W - 16) + 'px';
     const tw = tip.offsetWidth, th = tip.offsetHeight, mx = r.left + r.width / 2;
@@ -192,7 +193,12 @@ const GLYPH = {
   ing: ['M12 10.300a1.700 1.700 0 1 0 0 3.400 1.700 1.700 0 0 0 0-3.400M7.700 7.700a6.100 6.100 0 0 0 0 8.600M16.300 7.700a6.100 6.100 0 0 1 0 8.600M4.300 4.300a10.900 10.900 0 0 0 0 15.400M19.700 4.300a10.900 10.900 0 0 1 0 15.400', 1],
   nc: ['M8.800 9a3.300 3.300 0 1 1 4.900 2.900c-1.100.600-1.700 1.400-1.700 2.600M12 18.400v.01', 1]
 };
-const glyphStyle = (k, on) => !on || !GLYPH[k] ? 'display:none' : GLYPH[k][1] ? 'fill:none;stroke:#0b0b0c;stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round' : 'fill:#0b0b0c;stroke:none';
+// Remplissage de l'hexagone selon le seuil d'attribution (double la couleur) ; pictogramme clair quand l'hexagone est peu rempli
+const FILL = { 'Confirmé': '100%', 'Attribué': '76%', 'Suspecté': '38%', 'Non déterminé': '0%' };
+const GLIGHT = { 'Suspecté': 1, 'Non déterminé': 1 };
+const glyphStyle = (k, on, se) => !on || !GLYPH[k] ? 'display:none'
+  : GLIGHT[se] ? (GLYPH[k][1] ? 'fill:none;stroke:#f0ede6;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round' : 'fill:#f0ede6;stroke:#131315;stroke-width:1.8;paint-order:stroke;stroke-linejoin:round')
+  : GLYPH[k][1] ? 'fill:none;stroke:#0b0b0c;stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round' : 'fill:#0b0b0c;stroke:none';
 
 // Halo des seuils (suspecté, attribué, confirmé) repris sur les pastilles des légendes
 const HALO = { 'Confirmé': 'e6', 'Attribué': 'b8', 'Suspecté': '8c' };

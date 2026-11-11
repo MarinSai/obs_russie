@@ -176,3 +176,10 @@ header[data-rv]{border-image:linear-gradient(90deg,#5c5b62 0,#2b2b2f 45%,#19191b
 @media (hover:hover){.fj:hover .fj-t{text-decoration:underline;text-decoration-color:#dd203c;text-decoration-thickness:1px;text-underline-offset:3px}}
 .fpays{scrollbar-width:thin;scrollbar-color:#3a3a3d transparent}
 @media (max-width:760px){.fp-t{font-size:30px!important}.lg-types{gap:6px 14px!important}}
+
+/* ───── Sixième passe : remplissage selon le seuil, accessibilité ───── */
+.hx::after{background:linear-gradient(to top,transparent var(--f,100%),#131315 var(--f,100%)),linear-gradient(168deg,color-mix(in srgb,var(--c) 84%,#fff) 0%,var(--c) 46%,color-mix(in srgb,var(--c) 74%,#000) 100%)}
+@supports (overflow:clip){#carte{overflow:clip!important}}
+.fiche-t:focus{outline:none}
+@media (max-width:760px){.hlead{gap:14px!important}}
+@media (forced-colors:active){.hx,.hx::after{forced-color-adjust:none}}

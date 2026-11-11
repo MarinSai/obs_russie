@@ -1,7 +1,7 @@
 """Outils communs : serveur local + navigateur avec données locales."""
 import asyncio, json, os, re, http.server, socketserver, threading, functools
 from playwright.async_api import async_playwright
-ROOT = os.environ.get('OBS_WORK', os.path.expanduser('~/work'))
+ROOT = '/home/claude/work'
 DATA = open(os.path.join(ROOT, 'data/observatoire-data.json'), 'rb').read()
 PNG1 = bytes.fromhex('89504e470d0a1a0a0000000d4948445200000001000000010806000000'
                      '1f15c4890000000d49444154789c6360606060000000050001a5f645400000000049454e44ae426082')

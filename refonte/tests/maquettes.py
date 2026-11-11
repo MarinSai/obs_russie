@@ -1,5 +1,5 @@
-import asyncio, sys, json, collections, datetime, os
-sys.path.insert(0, os.path.join(os.environ.get('OBS_WORK', os.path.expanduser('~/work')), 'tools'))
+import asyncio, sys, json, collections, datetime
+sys.path.insert(0, '/home/claude/work/tools')
 from pw import *
 D = json.loads(DATA); EV = D['events']
 COL = {'Confirmé': '#dd203c', 'Attribué': '#f58c6c', 'Suspecté': '#e9d3a6', 'Non déterminé': '#77767b'}

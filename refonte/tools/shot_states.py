@@ -1,5 +1,5 @@
-import asyncio, sys, os
-sys.path.insert(0, os.path.join(os.environ.get('OBS_WORK', os.path.expanduser('~/work')), 'tools'))
+import asyncio, sys
+sys.path.insert(0, '/home/claude/work/tools')
 from pw import *
 async def clip(pg, sel, out, pad=10):
     el = pg.locator(sel).first
