@@ -37,12 +37,18 @@ function syncNums(root) {
 // y compris dans l'iframe ; aucune lecture de la position de défilement, et l'état masqué n'est posé que si l'observateur répond.
 function makeReveal(onShow) {
   if (!REVEAL || typeof IntersectionObserver === 'undefined' || REDUCE()) return { watch: el => { if (el.__rvw) return; el.__rvw = 1; onShow(el, false); } };
-  const io = new IntersectionObserver(entries => entries.forEach(en => {
+  const mk = th => { const io = new IntersectionObserver(entries => entries.forEach(en => {
     const el = en.target;
-    if (en.isIntersecting) { io.unobserve(el); el.classList.remove('rv-pre'); onShow(el, true); }
+    if (en.isIntersecting && (th < 0.3 ? en.intersectionRatio >= th : en.intersectionRect.height >= Math.min(230, en.boundingClientRect.height * 0.9))) { io.unobserve(el); el.classList.remove('rv-pre'); onShow(el, true); }
     else if (!el.__rvp) { el.__rvp = 1; el.classList.add('rv-pre'); }
-  }), { threshold: 0.18 });
-  return { watch: el => { if (el.__rvw) return; el.__rvw = 1; io.observe(el); } };
+  }), { threshold: th < 0.3 ? [0, th] : [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1] }); return io; };
+  // Chiffres clés : ils n'apparaissent qu'une fois franchement entrés dans l'écran (sur téléphone, pas tant qu'ils affleurent sous l'ouverture)
+  const io = mk(0.18), ioK = mk(0.42);
+  return { watch: el => { if (el.__rvw) return; el.__rvw = 1; if (el.getAttribute('data-rv') !== 'kf') { io.observe(el); return; }
+    // la mise en page de l'ouverture n'est définitive qu'une fois les polices chargées : on attend avant de juger si les chiffres sont à l'écran
+    el.__rvp = 1; el.classList.add('rv-pre');
+    const go = () => setTimeout(() => ioK.observe(el), 120);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(go, go); else go(); } };
 }
 // Trajet de zoom « van Wijk » (celui de d3.interpolateZoom, réécrit ici) : recul léger, déplacement, approche
 function zoomPath(a, b) {
