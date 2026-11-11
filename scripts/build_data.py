@@ -6,7 +6,8 @@
 - Reprend telles quelles les données fixes du fichier existant (fond de carte, grille, cadrages).
 - Garde la position sur la carte des événements déjà présents si leurs coordonnées n'ont pas changé ;
   calcule la position des nouveaux, en les écartant des points voisins.
-- Si une seule ligne est invalide, rien n'est écrit et le script échoue (le site garde l'ancienne version).
+- Si une seule ligne est invalide, ou si plus de 3 lignes disparaissent d'un coup, rien n'est écrit
+  et le script échoue (le site garde l'ancienne version).
 - Lit aussi la feuille « Observatoire – Médias » (publiée en CSV, adresse dans MEDIA_CSV_URL) :
   colonnes ID, Fichier, Type, Légende, Crédit ; seules les lignes dont « Fichier » est rempli sont publiées.
 Aucune dépendance : bibliothèque standard uniquement.
@@ -20,6 +21,7 @@ HEADERS = ["ID", "Type", "Année", "Date événement", "Date entrée", "Nom", "S
 SEUILS = {"Non déterminé", "Suspecté", "Attribué", "Confirmé"}
 CATS = {"Sabotage", "Incendie", "Aéronef", "Renseignement", "Ingérence", "Frappes de navires", "Actions non classifiables"}
 TYPES = {"Nouveau": False, "Passé": True}
+MAX_DROP = 3  # nombre maximal de lignes retirées d'un coup sans --allow-shrink
 
 # Projection de la carte (stéréographique), ajustée sur les positions du fichier de départ.
 # Les positions sont en % de la largeur (1000) et de la hauteur (720) du cadre "eu".
@@ -260,8 +262,11 @@ def main():
         print("La feuille contient %d problème(s) ; rien n'a été écrit :" % len(errors), file=sys.stderr)
         for m in errors[:60]: print(" -", m, file=sys.stderr)
         sys.exit(1)
-    if old and len(events) < 0.7 * len(old) and not a.allow_shrink:
-        raise SystemExit(f"{len(events)} lignes contre {len(old)} avant : baisse suspecte, rien n'est écrit.")
+    # Garde-fou : un retrait isolé passe, une baisse de plus de MAX_DROP lignes d'un coup bloque la publication
+    # (le site garde l'ancienne version). Pour un retrait volontaire plus large : lancer avec --allow-shrink.
+    if old and len(old) - len(events) > MAX_DROP and not a.allow_shrink:
+        raise SystemExit(f"{len(events)} lignes contre {len(old)} avant (baisse de {len(old) - len(events)}, "
+                         f"maximum {MAX_DROP}) : baisse suspecte, rien n'est écrit.")
     for k in ("land", "east", "grat", "vb"):
         if old and k not in old_json: raise SystemExit(f"Le fichier existant n'a pas la clé « {k} ».")
 
