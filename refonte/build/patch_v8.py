@@ -55,9 +55,9 @@ sub("const panEnd = ev => { if (!this.drag) return; const moved = this.drag.cap;
       // vitesse des 90 dernières millisecondes du geste ; pas d'élan si le doigt s'est arrêté avant de se lever
       const S = d.sm || [], a = S[0], b = S[S.length - 1], dt = a && b ? b[0] - a[0] : 0, idle = b ? performance.now() - b[0] : 1e9;
       let vx = dt > 8 ? (b[1] - a[1]) / dt : 0, vy = dt > 8 ? (b[2] - a[2]) / dt : 0; const sp = Math.hypot(vx, vy);
-      if (REDUCE() || idle > 60 || sp < 0.18 || !m) { this.commit(); return; }
-      if (sp > 4) { vx *= 4 / sp; vy *= 4 / sp; }
-      const r = m.getBoundingClientRect(), z0 = this.view(), TAU = 450, t0 = performance.now();
+      if (REDUCE() || idle > 60 || sp < 0.3 || !m) { this.commit(); return; }
+      if (sp > 2.5) { vx *= 2.5 / sp; vy *= 2.5 / sp; }
+      const r = m.getBoundingClientRect(), z0 = this.view(), TAU = 240, t0 = performance.now();
       const step = () => {
         const t = performance.now() - t0, f = TAU * (1 - Math.exp(-t / TAU)), dx = vx * f, dy = vy * f;
         const want = { k: z0.k, cx: z0.cx - dx / r.width * 100 / z0.k, cy: z0.cy - dy / r.height * 100 / (z0.k * ASP) }, got = clampZ(want);
