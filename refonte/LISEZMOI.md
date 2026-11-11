@@ -12,7 +12,7 @@ La page test (`observatoire_test.html`) est produite à partir de `observatoire.
 - `tools/perf.py`, `tools/iframe_test.py`, `tests/*.py` : vérifications (fluidité, hauteur d'iframe,
   mouvement réduit, clavier, clics, étiquettes FR/IT, activité au repos, captures, maquettes).
 
-Les scripts supposent la racine `/home/claude/work` (constante `ROOT`) : src/observatoire.html,
+Les scripts supposent la racine `~/work` (constante `ROOT`, modifiable avec la variable d'environnement `OBS_WORK`) : src/observatoire.html,
 data/observatoire-data.json, repo/obs_russie (clone en lecture), site/, shots/.
 Chaque remplacement de `patch.py` vérifie son nombre d'occurrences : si la page de production change,
 le script s'arrête sur le remplacement à revoir au lieu de produire une page fausse.

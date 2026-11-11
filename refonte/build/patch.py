@@ -2,7 +2,7 @@
 """Applique la refonte au gabarit d'origine (unpacked/template.html) -> build/template.html.
 Chaque remplacement vérifie le nombre d'occurrences attendu : si la page d'origine change, le script s'arrête."""
 import re, sys, os
-ROOT = '/home/claude/work'
+ROOT = os.environ.get('OBS_WORK', os.path.expanduser('~/work'))
 t = open(os.path.join(ROOT, 'unpacked/template.html'), encoding='utf-8').read()
 CSS = open(os.path.join(ROOT, 'build/extra.css'), encoding='utf-8').read() + open(os.path.join(ROOT, 'build/assets.css'), encoding='utf-8').read()
 MOTION = open(os.path.join(ROOT, 'build/motion.js'), encoding='utf-8').read()
