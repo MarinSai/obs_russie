@@ -90,7 +90,7 @@ a{color:#ea4d62;transition:color .15s}
 /* Journal et méthodologie : volets */
 .acc{display:block}
 @media (max-width:760px){
-  .jrow{display:grid!important;grid-template-columns:auto auto minmax(0,1fr) auto;align-items:center!important;gap:8px 10px!important;padding:14px 4px!important}
+  .jrow{display:grid!important;grid-template-columns:auto auto minmax(0,1fr) auto;align-items:center!important;gap:8px 10px!important;padding:14px 0!important}
   .jrow .jd{grid-row:1;width:auto!important}
   .jrow .jdot{grid-row:1}
   .jrow .jpays{grid-row:1;grid-column:3;justify-self:end}
@@ -191,3 +191,18 @@ header[data-rv]{border-image:linear-gradient(90deg,#5c5b62 0,#2b2b2f 45%,#19191b
   #hero .herodate{bottom:20px!important}
   .kfsec{padding-top:12px!important}
 }
+
+/* ───── Huitième passe : chronologie défilante, alignements sur téléphone ───── */
+.chr-sc{overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:#3a3a3d transparent;-webkit-overflow-scrolling:touch}
+@media (max-width:760px){
+  .fbar{align-items:flex-start!important}
+  .fbar>span:first-child{width:100%;margin:0!important}
+  .fbar>span:last-child{margin-left:0!important;width:100%;flex-wrap:wrap}
+  .fbar .chip,.fbar .cta{min-height:36px;box-sizing:border-box;align-items:center}
+  .fbar .cta,.fbar>span:last-child>.chip{display:inline-flex;align-items:center}
+}
+/* panneau latéral : le contenu des lignes s'aligne sur les intertitres (le fond de survol déborde) */
+.side-seuils .row,.side-pays .row{margin-left:-8px;width:calc(100% + 16px)!important;box-sizing:border-box}
+.side-seuils>label{padding-left:0!important}
+@media (max-width:900px){.side-seuils .row{margin-left:0;width:auto!important}.side-seuils .row:nth-of-type(odd){padding-left:0!important}}
+@media (max-width:760px){.side-pays .row{margin-left:-6px;width:calc(100% + 12px)!important}}
