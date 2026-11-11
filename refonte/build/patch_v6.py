@@ -75,11 +75,7 @@ sub('''    // Pays choisi dans le classement : la carte vient le cadrer''',
     }
     // Pays choisi dans le classement : la carte vient le cadrer''')
 
-# ── Effet du titre : deux salves au chargement (moins de cinq secondes), puis une à chaque retour de l'ouverture à l'écran ──
-sub("else { applyGl(null); this.gt = setTimeout(burst, R(1600, 5200)); }",
-    "else { applyGl(null); this.gt = (this.glN = (this.glN || 0) + 1) >= 2 ? null : setTimeout(burst, R(1100, 1900)); }")
-sub("this.heroOn = en.isIntersecting; h.classList.toggle('off', !en.isIntersecting);",
-    "this.heroOn = en.isIntersecting; h.classList.toggle('off', !en.isIntersecting); if (en.isIntersecting && this.glN >= 2 && !this.gt) { this.glN = 1; this.gt = setTimeout(() => burst(), 500); }")
+# ── Effet du titre : conservé en continu (choix de Marin) ; en pause hors écran comme avant ──
 # mouvement réduit : pas de décodage du titre
 sub("    let f = 0;\n    this.decode = setInterval(() => {", "    let f = REDUCE() ? 46 : 0;\n    this.decode = setInterval(() => {")
 

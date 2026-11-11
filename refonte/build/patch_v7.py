@@ -39,3 +39,21 @@ sub("    // Halo de couleur sous les marqueurs dont l'attribution est au moins s
       });
     });
     // Halo de couleur sous les marqueurs dont l'attribution est au moins suspectée""")
+
+# ── Téléphone : les foyers se défont dès que la carte est assez zoomée (plus aucun regroupement au-delà de ×2,6) ;
+#    un toucher sur un foyer zoome au moins jusqu'à ce seuil ──
+sub("    if (wPx < 520 && raw.length) {", "    if (wPx < 520 && raw.length && Z.k < CLZ) {")
+sub("pick: () => animTo({ k: Math.min(8, Z.k * 2.3),", "pick: () => animTo({ k: Math.min(ZMAX, Math.max(CLZ + .05, Z.k * 2.3)),")
+sub("const ZMAX = 6, ZMIN = 0.74;", "const ZMAX = 6, ZMIN = 0.74, CLZ = 2.6;")
+
+# ── Constat en ouverture : « 11 événements », puis la semaine (chaînes existantes) ──
+sub('''          <span class="fig" style="font-size: clamp(44px, 5vw, 72px); line-height: .86; color: #f3f1ec;">{{heroLead.n}}</span>
+          <span style="display: flex; flex-direction: column; gap: 5px;"><span style="font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase; color: #ea4d62;">{{heroLead.label}}</span>''',
+    '''          <span style="font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase; color: #ea4d62;">{{heroLead.label}}</span>
+          <span style="display: flex; flex-direction: column; gap: 6px;"><span style="display: flex; align-items: baseline; gap: 10px;"><span class="fig" style="font-size: clamp(44px, 5vw, 72px); line-height: .86; color: #f3f1ec;">{{heroLead.n}}</span><span style="font-family: 'GC Sanomat', Georgia, serif; font-size: clamp(22px, 2.2vw, 30px); line-height: 1; color: #f3f1ec;">{{heroLead.unit}}</span></span>''')
+sub("const heroLead = { n: String(hN), label: 'Dernière semaine',", "const heroLead = { n: String(hN), unit: (' événements').trim(), label: 'Dernière semaine',")
+sub("style: EV.length && lw > 0 ? 'display:flex;align-items:center;gap:18px' : 'display:none' };",
+    "style: EV.length && lw > 0 ? 'display:flex;flex-direction:column;gap:10px' : 'display:none' };")
+sub('''  <!-- Chiffres clés -->
+  <section style="''', '''  <!-- Chiffres clés -->
+  <section class="kfsec" style="''')
