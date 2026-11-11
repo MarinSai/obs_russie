@@ -43,10 +43,8 @@ sub("    const lw = NWC - 1, lwN = wCounts[lw] || 0, pwN = wCounts[lw - 1] || 0;
 sub("legend, legendPasse, legendPasseCore, legendNc, cf,", "legend, legendPasse, legendPasseCore, legendNc, heroLead, cf,")
 
 # ── Chronologie : colonnes par semaine aussi sur ordinateur (essai) ──
-sub("byDay = CW / NSL >= 15, NCOL", "byDay = false, NCOL")
+# (essai de colonnes par semaine sur ordinateur écarté par Marin : la chronologie reste par jour quand la place le permet)
 sub(": Math.max(8, Math.min(16, Math.floor(slotW) - 8));", ": Math.max(8, Math.min(slotW >= 120 ? 20 : 16, Math.floor(slotW) - 8));")
-sub("const perRow = byDay ? 1 : Math.max(1, Math.min(4, Math.floor((slotW - 6) / (HXC + 4))));",
-    "const perRow = byDay ? 1 : Math.max(1, Math.min(slotW >= 120 ? 3 : 4, Math.floor((slotW - 6) / (HXC + 4))));")
 sub(": '#6f6d68') + (byDay && slotW >= 21", ": '#8f8c86') + (byDay && slotW >= 21")
 
 # ── Fiche d'événement : nommée, et le focus y entre à l'ouverture puis revient à son point de départ ──
@@ -85,5 +83,3 @@ sub("this.heroOn = en.isIntersecting; h.classList.toggle('off', !en.isIntersecti
 # mouvement réduit : pas de décodage du titre
 sub("    let f = 0;\n    this.decode = setInterval(() => {", "    let f = REDUCE() ? 46 : 0;\n    this.decode = setInterval(() => {")
 
-# en colonnes par semaine, le total figure déjà au pied de la colonne quand il y a la place : pas de doublon en tête
-sub("topStyle: MONO + 'height:16px;line-height:16px;white-space:nowrap;' + (pk ?", "topStyle: (!byDay && !wTight ? 'visibility:hidden;' : '') + MONO + 'height:16px;line-height:16px;white-space:nowrap;' + (pk ?")
