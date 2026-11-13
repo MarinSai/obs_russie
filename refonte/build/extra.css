@@ -212,3 +212,12 @@ header[data-rv]{border-image:linear-gradient(90deg,#5c5b62 0,#2b2b2f 45%,#19191b
 .glitch .tscr{display:none}
 .glitch.dec .treal{visibility:hidden}
 .glitch.dec .tscr{display:block;position:absolute;inset:0;overflow:hidden;white-space:pre;pointer-events:none}
+
+/* ───── Neuvième passe : derniers événements ajoutés ───── */
+.nwd{width:9px;height:9px;flex:none;border-radius:50%;background:#dd203c;box-shadow:0 0 0 4px rgba(221,32,60,.22)}
+.nwb[aria-pressed="true"] .nwd{background:#0b0b0c;box-shadow:none}
+.nwb[aria-pressed="true"] span span:last-child{color:#4a4950!important}
+@media (hover:hover){.nwb[aria-pressed="false"]:hover{border-color:#a3a09a!important}}
+#carte .pt.is-dim{opacity:.14;transition:opacity .4s}
+#carte .pt.is-dim .gly{display:none}
+#carte .pt.is-new{z-index:4!important;filter:drop-shadow(0 0 1.2px #fff) drop-shadow(0 0 1.2px #fff) drop-shadow(0 0 7px rgba(255,255,255,.55))}
