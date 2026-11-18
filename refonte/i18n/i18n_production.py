@@ -42,7 +42,7 @@ MARKUP = {
     "Rejouer": ("Rivedi", "Reproducir"),
     "Renseignement": ("Intelligence", "Inteligencia"),
     "Russie et Biélorussie": ("Russia e Bielorussia", "Rusia y Bielorrusia"),
-    "Réinitialiser la sélection": ("Reimposta la selezione", "Restablecer la selección"),
+    "Passer la carte": ("Salta la mappa", "Saltar el mapa"),
     "Sabotages": ("Sabotaggi", "Sabotajes"),
     "Semaines de veille": ("Settimane di monitoraggio", "Semanas de seguimiento"),
     "Seuil d'attribution": ("Soglia di attribuzione", "Umbral de atribución"),
@@ -112,6 +112,8 @@ JS = {
     "Afficher les ": ("Mostra i ", "Mostrar los "),
     "Date": ("Data", "Fecha"),
     "Dernière semaine": ("Ultima settimana", "Última semana"),
+    "Dernière semaine complète": ("Ultima settimana completa", "Última semana completa"),
+    "Carte des ": ("Mappa dei ", "Mapa de los "),
     "Glisser pour déplacer, pincer pour zoomer": ("Trascinate per spostare, pizzicate per ingrandire", "Arrastre para mover, pellizque para ampliar"),
     "Glisser pour déplacer, pincer, double-clic ou Ctrl + molette pour zoomer":
         ("Trascinate per spostare; pizzico, doppio clic o Ctrl + rotella per ingrandire", "Arrastre para mover; pellizco, doble clic o Ctrl + rueda para ampliar"),

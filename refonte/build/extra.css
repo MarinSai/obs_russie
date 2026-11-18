@@ -221,3 +221,15 @@ header[data-rv]{border-image:linear-gradient(90deg,#5c5b62 0,#2b2b2f 45%,#19191b
 #carte .pt.is-dim{opacity:.14;transition:opacity .4s}
 #carte .pt.is-dim .gly{display:none}
 #carte .pt.is-new{z-index:4!important;filter:drop-shadow(0 0 1.2px #fff) drop-shadow(0 0 1.2px #fff) drop-shadow(0 0 7px rgba(255,255,255,.55))}
+
+/* ───── Passe 15 ───── */
+@media (max-width:760px){
+  .fiche.fev{position:relative!important;inset:auto!important;width:auto!important;max-height:none!important;overflow:visible!important;margin-top:10px;box-shadow:none!important;padding:16px 18px 18px!important}
+}
+/* zone de toucher élargie autour des petits hexagones (apparence inchangée) */
+@media (pointer:coarse){
+  #carte .pt:not(.clu)::after{content:"";position:absolute;inset:-9px}
+  .pt.wd::after{content:"";position:absolute;inset:-4px}
+}
+.skip{position:absolute;left:-9999px;top:0;z-index:20;padding:9px 14px;border:1px solid #dd203c;background:#0d0d0e;color:#f3f1ec;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+.skip:focus{position:relative;left:0;display:inline-block;margin-bottom:10px}
