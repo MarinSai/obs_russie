@@ -61,6 +61,20 @@ def build(lang, k):
         rep("const fLong = d => { const p = parse(d); return p.j + ' ' + MOISL[p.m - 1] + ' ' + p.y; };",
             "const fLong = d => { const p = parse(d); return p.j + ' de ' + MOISL[p.m - 1] + ' de ' + p.y; };")
 
+    # Accords (singulier pour 1 seulement) et formes singulier/pluriel des mots composés par PL/PLT
+    rep("const PL = (n, w) => n + PLW[w][n > 1 ? 1 : 0];", "const PL = (n, w) => n + PLW[w][n === 1 ? 0 : 1];")
+    rep("const PLT = (n, w) => PLW[w][n > 1 ? 1 : 0];", "const PLT = (n, w) => PLW[w][n === 1 ? 0 : 1];")
+    plw = {
+        "it": "{ pays: [' paese', ' paesi'], evt: [' evento', ' eventi'], aff: [' evento visualizzato', ' eventi visualizzati'], affT: ['Evento visualizzato', 'Eventi visualizzati'], ant: [' fatto anteriore al 23 sett.', ' fatti anteriori al 23 sett.'] }",
+        "es": "{ pays: [' país', ' países'], evt: [' suceso', ' sucesos'], aff: [' suceso mostrado', ' sucesos mostrados'], affT: ['Suceso mostrado', 'Sucesos mostrados'], ant: [' hecho anterior al 23 sept.', ' hechos anteriores al 23 sept.'] }",
+    }[lang]
+    t, n3 = re.subn(r"const PLW = \{[^\n]*\};", lambda m: "const PLW = " + plw + ";", t)
+    if n3 != 1: missing.append("const PLW")
+    if lang == "it":
+        # élision devant un nombre qui se prononce avec une voyelle (1, 8, 11, 80-89, 800…)
+        rep("const EL = (p, n) => p + n;",
+            "const EL = (p, n) => { const s = String(n); if (/^(1|11)(\\D|$)/.test(s) || /^0?8/.test(s)) { if (/(al|del|dal) $/.test(p)) return p.slice(0, -1) + \"l'\" + s; if (/(^|\\s)dei $/.test(p)) return p.replace(/dei $/, 'degli ') + s; if (/(^|\\s)i $/.test(p)) return p.replace(/i $/, 'gli ') + s; } return p + s; };")
+
     # Pluriel des images
     rep("withMedia.length + ' image' + (withMedia.length > 1 ? 's' : '')",
         "withMedia.length + (withMedia.length > 1 ? " + ("' immagini' : ' immagine')" if lang == "it" else "' imágenes' : ' imagen')"))

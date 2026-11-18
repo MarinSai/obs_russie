@@ -71,7 +71,6 @@ MARKUP = {
     "sur les 30 suivis : les 27 États membres, la Moldavie, le Royaume-Uni et la Norvège.":
         ("sui 30 monitorati: i 27 Stati membri, la Moldavia, il Regno Unito e la Norvegia.",
          "de los 30 seguidos: los 27 Estados miembros, Moldavia, el Reino Unido y Noruega."),
-    "Événements affichés": ("Eventi visualizzati", "Sucesos mostrados"),
     "Événements par jour": ("Eventi per giorno", "Sucesos por día"),
     "Passer la chronologie": ("Salta la cronologia", "Saltar la cronología"),
     "à partir de la presse et des autorités de chaque pays, dans leur langue.":
@@ -79,7 +78,6 @@ MARKUP = {
          "a partir de la prensa y de las autoridades de cada país, en su idioma."),
     "↑ Carte": ("↑ Mappa", "↑ Mapa"),
     "↑ Revenir à la carte": ("↑ Torna alla mappa", "↑ Volver al mapa"),
-    "{{nPays}} pays — {{scope}}": ("{{nPays}} paesi — {{scope}}", "{{nPays}} países — {{scope}}"),
 }
 
 # Attributs (aria-label, alt…)
@@ -102,14 +100,10 @@ ATTRS = {
 JS = {
     "depuis le 23 sept. 2026": ("dal 23 sett. 2026", "desde el 23 sept. 2026"),
     "dont ": ("di cui ", "de los cuales "),
-    " faits antérieurs au 23 sept.": (" fatti anteriori al 23 sett.", " hechos anteriores al 23 sept."),
     " au total": (" in totale", " en total"),
     " derniers événements": (" ultimi eventi", " últimos sucesos"),
     " dernier événement": (" ultimo evento", " último suceso"),
-    " événement affiché": (" evento visualizzato", " suceso mostrado"),
-    " événements affichés": (" eventi visualizzati", " sucesos mostrados"),
     " événements": (" eventi", " sucesos"),
-    " événements, ": (" eventi, ", " sucesos, "),
     " par rapport à la précédente)": (" rispetto alla precedente)", " respecto a la anterior)"),
     " pays": (" paesi", " países"),
     "Afficher les ": ("Mostra i ", "Mostrar los "),
@@ -118,9 +112,11 @@ JS = {
     "du ": ("dal ", "del "),
     " au ": (" al ", " al "),
     " par jour": (" al giorno", " al día"),
-    "Carte des ": ("Mappa dei ", "Mapa de los "),
+    "Carte : ": ("Mappa: ", "Mapa: "),
+    " : ": (": ", ": "),
+    "Pays-Bas": ("Paesi Bassi", "Países Bajos"),
+    "Royaume-Uni": ("Regno Unito", "Reino Unido"),
     # Villes repères de la carte zoomée
-    "Poznań": ("Poznań", "Poznan"),
     "Wrocław": ("Breslavia", "Breslavia"),
     "Paris": ("Parigi", "París"),
     "Londres": ("Londra", "Londres"),
@@ -132,7 +128,6 @@ JS = {
     "Copenhague": ("Copenaghen", "Copenhague"),
     "Prague": ("Praga", "Praga"),
     "Vienne": ("Vienna", "Viena"),
-    "Chișinău": ("Chișinău", "Chisináu"),
     "Sofia": ("Sofia", "Sofía"),
     "Rome": ("Roma", "Roma"),
     "Dublin": ("Dublino", "Dublín"),
@@ -142,7 +137,7 @@ JS = {
     "Zagreb": ("Zagabria", "Zagreb"),
     "Belgrade": ("Belgrado", "Belgrado"),
     "Kaliningrad": ("Kaliningrad", "Kaliningrado"),
-    "Gdańsk": ("Danzica", "Gdansk"),
+    "Gdańsk": ("Danzica", "Gdańsk"),
     "Cracovie": ("Cracovia", "Cracovia"),
     "Hambourg": ("Amburgo", "Hamburgo"),
     "Munich": ("Monaco di Baviera", "Múnich"),
