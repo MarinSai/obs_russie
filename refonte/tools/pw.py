@@ -19,6 +19,7 @@ async def route(ctx, log=None):
     async def handler(r):
         u = r.request.url
         if u.startswith('http://127.0.0.1') or u.startswith('http://localhost'): return await r.continue_()
+        if 'observatoire-data-es' in u: return await r.fulfill(status=200, content_type='application/json', body=open(ROOT + '/repo/obs_russie/observatoire-data-es.json','rb').read(), headers={'access-control-allow-origin': '*'})
         if 'observatoire-data-it' in u: return await r.fulfill(status=200, content_type='application/json', body=open(ROOT + '/repo/obs_russie/observatoire-data-it.json','rb').read(), headers={'access-control-allow-origin': '*'})
         if 'observatoire-data' in u:
             return await r.fulfill(status=200, content_type='application/json', body=DATA, headers={'access-control-allow-origin': '*'})
