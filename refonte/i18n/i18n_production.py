@@ -102,6 +102,7 @@ JS = {
     " faits antérieurs au 23 sept.": (" fatti anteriori al 23 sett.", " hechos anteriores al 23 sept."),
     " au total": (" in totale", " en total"),
     " derniers événements": (" ultimi eventi", " últimos sucesos"),
+    " dernier événement": (" ultimo evento", " último suceso"),
     " événement affiché": (" evento visualizzato", " suceso mostrado"),
     " événements affichés": (" eventi visualizzati", " sucesos mostrados"),
     " événements": (" eventi", " sucesos"),
