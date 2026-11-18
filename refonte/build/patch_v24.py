@@ -5,3 +5,7 @@ sub("La guerre russe contre l’Europe vise en premier lieu", "La guerre politiq
 sub("une possible escalade de la guerre russe contre l’Europe", "une possible escalade de la guerre politique russe contre l’Europe")
 sub("c’est-à-dire des incidents très médiatisés dont aucun lien avec la Russie n’est établi, mais qui pourraient relever de sa campagne",
     "c’est-à-dire des incidents dont aucun lien avec la Russie n’est établi, mais qui pourraient relever de sa campagne sur la base d’un faisceau d’indices")
+# paragraphe sur l'identifiant unique retiré (les identifiants ne sont plus affichés)
+i0 = t.index('suspecté ».",\n   "Chaque incident inclus'); i0 = t.index('",\n   "Chaque incident inclus', i0)
+i1 = t.index('"\n  ]', i0 + 5)
+t = t[:i0] + t[i1:]

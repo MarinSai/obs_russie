@@ -263,8 +263,7 @@ METHODE = {
     ["Attribuito,", "quando un rappresentante governativo o un’agenzia di intelligence ha indicato la Russia come sospettata o potenziale responsabile;", "Attribué"],
     ["Confermato,", "quando la responsabilità della Russia è stata dimostrata da uno o più governi o da autorità europee.", "Confirmé"]]},
   {"titre": "Frequenza di aggiornamento della banca dati", "paras": [
-   "La banca dati dell’Osservatorio è aggiornata quotidianamente sul sito del Grand Continent. Le voci possono evolvere in occasione di questi aggiornamenti, in particolare quando la responsabilità di incidenti passati viene attribuita a posteriori alla Russia dalle autorità competenti, quando tale responsabilità viene esclusa, o quando nuovi elementi portano a riqualificare un attore non determinato come attore «sospetto».",
-   "Ogni incidente incluso nella banca dati è associato a un identificativo unico, che permette di seguirne l’evoluzione, compreso lo svolgimento di un’indagine o di eventuali procedimenti giudiziari."]},
+   "La banca dati dell’Osservatorio è aggiornata quotidianamente sul sito del Grand Continent. Le voci possono evolvere in occasione di questi aggiornamenti, in particolare quando la responsabilità di incidenti passati viene attribuita a posteriori alla Russia dalle autorità competenti, quando tale responsabilità viene esclusa, o quando nuovi elementi portano a riqualificare un attore non determinato come attore «sospetto»."]},
   {"titre": "Prossimi aggiornamenti", "paras": [
    "L’Osservatorio sarà aggiornato regolarmente per integrare nuove funzionalità. La prossima versione sarà pubblicata il 9 dicembre 2026."]},
  ],
@@ -296,8 +295,7 @@ METHODE = {
     ["Atribuido,", "cuando un representante gubernamental o una agencia de inteligencia ha señalado a Rusia como sospechosa o posible responsable;", "Attribué"],
     ["Confirmado,", "cuando la responsabilidad de Rusia ha sido demostrada por uno o varios gobiernos o por autoridades europeas.", "Confirmé"]]},
   {"titre": "Frecuencia de actualización de la base de datos", "paras": [
-   "La base de datos del Observatorio se actualiza diariamente en el sitio del Grand Continent. Las entradas pueden evolucionar con estas actualizaciones, en particular cuando la responsabilidad de incidentes pasados es atribuida a posteriori a Rusia por las autoridades competentes, cuando esa responsabilidad se descarta, o cuando nuevos elementos llevan a recalificar a un actor no determinado como actor «sospechado».",
-   "Cada incidente incluido en la base de datos está vinculado a un identificador único, que permite seguir su evolución, incluido el desarrollo de una investigación o de eventuales procesos judiciales."]},
+   "La base de datos del Observatorio se actualiza diariamente en el sitio del Grand Continent. Las entradas pueden evolucionar con estas actualizaciones, en particular cuando la responsabilidad de incidentes pasados es atribuida a posteriori a Rusia por las autoridades competentes, cuando esa responsabilidad se descarta, o cuando nuevos elementos llevan a recalificar a un actor no determinado como actor «sospechado»."]},
   {"titre": "Próximas actualizaciones", "paras": [
    "El Observatorio se actualizará regularmente para incorporar nuevas funcionalidades. La próxima versión se publicará el 9 de diciembre de 2026."]},
  ],
