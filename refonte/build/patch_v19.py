@@ -87,3 +87,6 @@ sub('''        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 
 sub('''  <div class="chr">\n      <div class="ctog"''', '''  <div class="chr" data-t="{{chrTypeOn}}">\n      <div class="ctog"''')
 sub("    const ctW = Array.from({ length: NWC }, (_, i) => i);", "    const ctW = Array.from({ length: NW }, (_, i) => i);")
 sub("repeat(' + NWC + ',minmax(54px,1fr)) 34px'", "repeat(' + NW + ',minmax(64px,1fr)) 34px'")
+# « Passer la chronologie » valable aussi en vue par type : le focus va juste après le tableau
+sub("      </div></div>\n      </sc-if>\n      <div class=\"chr-sc\"", "      </div></div>\n      <span id=\"sk-ct\" tabindex=\"-1\"></span>\n      </sc-if>\n      <div class=\"chr-sc\"")
+sub("skipChr: () => { const el = document.getElementById('sk-wk'); if (el) el.focus(); },", "skipChr: () => { const el = document.getElementById(st.chrT ? 'sk-ct' : 'sk-wk'); if (el) el.focus(); },")
