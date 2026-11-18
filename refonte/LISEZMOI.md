@@ -3,7 +3,7 @@
 La page test (`observatoire_test.html`) est produite à partir de `observatoire.html` (production), jamais modifiée.
 
     python3 tools/unpack.py     # extrait le gabarit de observatoire.html dans unpacked/
-    python3 build/patch.py      # applique les douze passes (patch.py enchaîne patch_v2 à patch_v12)
+    python3 build/patch.py      # applique les treize passes (patch.py enchaîne patch_v2 à patch_v13)
     python3 tools/pack.py       # réécrit le gabarit dans site/observatoire_test.html
 
 - `build/extra.css`, `build/assets.css` : styles ajoutés (hexagones, grain, mouvement réduit).

@@ -9,6 +9,7 @@ TITLE = {
 
 # Textes affichés dans la page (entre balises)
 MARKUP = {
+    "Copier le lien de l’événement": ("Copia il link dell’evento", "Copiar el enlace del suceso"),
     "Action non classifiable": ("Azione non classificabile", "Acción no clasificable"),
     "Actions non classifiables": ("Azioni non classificabili", "Acciones no clasificables"),
     "Attribuées ou confirmées": ("Attribuite o confermate", "Atribuidas o confirmadas"),
@@ -21,7 +22,9 @@ MARKUP = {
     "Chargement des données…": ("Caricamento dei dati…", "Cargando los datos…"),
     "Envoyer un signalement": ("Invia una segnalazione", "Enviar un aviso"),
     "Fait antérieur au 23 sept.": ("Fatto anteriore al 23 sett.", "Hecho anterior al 23 sept."),
-    "Fait antérieur au 23 septembre 2026.": ("Fatto anteriore al 23 settembre 2026.", "Hecho anterior al 23 de septiembre de 2026."),
+    "Fait antérieur au 23 septembre 2026, date du début de la veille, intégré parce qu’il a été révélé ou a connu un développement nouveau après cette date.":
+        ("Fatto anteriore al 23 settembre 2026, data di inizio del monitoraggio, inserito perché è stato reso noto o ha conosciuto uno sviluppo nuovo dopo tale data.",
+         "Hecho anterior al 23 de septiembre de 2026, fecha de inicio del seguimiento, incorporado porque se reveló o conoció un nuevo desarrollo después de esa fecha."),
     "Faites défiler pour explorer la carte.": ("Scorrete per esplorare la mappa.", "Desplácese para explorar el mapa."),
     "Frappes de navires": ("Attacchi contro navi", "Ataques contra buques"),
     "Incendies": ("Incendi", "Incendios"),
@@ -58,9 +61,9 @@ MARKUP = {
     "Un événement manque ?": ("Manca un evento?", "¿Falta un suceso?"),
     "Version bêta": ("Versione beta", "Versión beta"),
     "Voir sur la carte": ("Vedi sulla mappa", "Ver en el mapa"),
-    "de sabotage, d’espionnage et de déstabilisation, documentées par l’Observatoire, dont {{nPasse}} antérieures au 23 septembre 2026.":
-        ("di sabotaggio, spionaggio e destabilizzazione, documentate dall’Osservatorio, di cui {{nPasse}} anteriori al 23 settembre 2026.",
-         "de sabotaje, espionaje y desestabilización, documentadas por el Observatorio, de las cuales {{nPasse}} anteriores al 23 de septiembre de 2026."),
+    "de sabotage, d’espionnage et de déstabilisation, documentées depuis le 23 septembre 2026.":
+        ("di sabotaggio, spionaggio e destabilizzazione, documentate dal 23 settembre 2026.",
+         "de sabotaje, espionaje y desestabilización, documentadas desde el 23 de septiembre de 2026."),
     "les deux niveaux les plus élevés de notre seuil d'attribution.":
         ("i due livelli più alti della nostra soglia di attribuzione.", "los dos niveles más altos de nuestro umbral de atribución."),
     "sur les 30 suivis : les 27 États membres, la Moldavie, le Royaume-Uni et la Norvège.":
@@ -78,7 +81,6 @@ MARKUP = {
 
 # Attributs (aria-label, alt…)
 ATTRS = {
-    "Copier le lien": ("Copia il link", "Copiar el enlace"),
     "Afficher toute la période": ("Mostra tutto il periodo", "Mostrar todo el período"),
     "Dézoomer": ("Riduci", "Alejar"),
     "Fermer le détail": ("Chiudi il dettaglio", "Cerrar el detalle"),
