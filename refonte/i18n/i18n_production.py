@@ -78,6 +78,7 @@ MARKUP = {
 
 # Attributs (aria-label, alt…)
 ATTRS = {
+    "Copier le lien": ("Copia il link", "Copiar el enlace"),
     "Afficher toute la période": ("Mostra tutto il periodo", "Mostrar todo el período"),
     "Dézoomer": ("Riduci", "Alejar"),
     "Fermer le détail": ("Chiudi il dettaglio", "Cerrar el detalle"),
