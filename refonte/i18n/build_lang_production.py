@@ -73,7 +73,13 @@ def build(lang, k):
     if lang == "it":
         # élision devant un nombre qui se prononce avec une voyelle (1, 8, 11, 80-89, 800…)
         rep("const EL = (p, n) => p + n;",
-            "const EL = (p, n) => { const s = String(n); if (/^(1|11)(\\D|$)/.test(s) || /^0?8/.test(s)) { if (/(al|del|dal) $/.test(p)) return p.slice(0, -1) + \"l'\" + s; if (/(^|\\s)dei $/.test(p)) return p.replace(/dei $/, 'degli ') + s; if (/(^|\\s)i $/.test(p)) return p.replace(/i $/, 'gli ') + s; } return p + s; };")
+            "const EL = (p, n) => { const s = String(n); if (s === '1') return p + '1°'; if (/^(1|11)([^\\d°]|$)/.test(s) || /^0?8/.test(s)) { if (/(al|del|dal) $/.test(p)) return p.slice(0, -1) + \"l'\" + s; if (/(^|\\s)dei $/.test(p)) return p.replace(/dei $/, 'degli ') + s; if (/(^|\\s)i $/.test(p)) return p.replace(/i $/, 'gli ') + s; } return p + s; };")
+
+    if lang == "it":
+        # premier du mois : « 1° »
+        t, a1 = re.subn(r"p\.j \+ ' ' \+ (MOISL?)\[", lambda m: "p.j + (p.j === 1 ? '°' : '') + ' ' + " + m.group(1) + "[", t)
+        t, a2 = re.subn(r"(d|dateOfDay\(weekStartDay\(i\)\))\.getDate\(\) \+ ' ' \+ MOIS\[", lambda m: m.group(1) + ".getDate() + (" + m.group(1) + ".getDate() === 1 ? '°' : '') + ' ' + MOIS[", t)
+        if a1 < 3 or a2 < 5: missing.append("dates 1° (%d, %d)" % (a1, a2))
 
     # Pluriel des images
     rep("withMedia.length + ' image' + (withMedia.length > 1 ? 's' : '')",

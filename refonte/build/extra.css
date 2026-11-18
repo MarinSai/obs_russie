@@ -273,3 +273,8 @@ header[data-rv]{border-image:linear-gradient(90deg,#5c5b62 0,#2b2b2f 45%,#19191b
 @media (max-width:760px){.hdot{width:24px;height:24px;margin:-12px 0 0 -12px}.hdot>span.hx{inset:6.5px}.hdot>span.hcore{inset:9px}}
 @media (max-width:760px){.hdot>span{opacity:.55}}
 .ct-n{border-left:1px solid #2c2c30;padding-left:8px}
+/* Passe 24 : vue par type, catégorie fixe à gauche quand le tableau défile (téléphone) */
+@media (max-width:760px){
+  .ct-l,.ct .ct-h:first-child{position:sticky;left:0;z-index:2;background:#0d0d0e}
+  .ct-l{box-shadow:6px 0 8px -6px rgba(0,0,0,.8);padding-right:8px}
+}
