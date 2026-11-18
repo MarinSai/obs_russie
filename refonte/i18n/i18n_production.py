@@ -62,7 +62,6 @@ MARKUP = {
         ("Un esagono per evento, collocato alla sua data. Cliccate su una settimana per filtrare la mappa, o su un esagono per aprirlo. I fatti anteriori al 23 settembre non vi figurano.",
          "Un hexágono por suceso, situado en su fecha. Haga clic en una semana para filtrar el mapa, o en un hexágono para abrirlo. Los hechos anteriores al 23 de septiembre no figuran en ella."),
     "Un événement manque ?": ("Manca un evento?", "¿Falta un suceso?"),
-    "Version bêta": ("Versione beta", "Versión beta"),
     "Voir sur la carte": ("Vedi sulla mappa", "Ver en el mapa"),
     "de sabotage, d’espionnage et de déstabilisation, documentées depuis le 23 septembre 2026.":
         ("di sabotaggio, spionaggio e destabilizzazione, documentate dal 23 settembre 2026.",
