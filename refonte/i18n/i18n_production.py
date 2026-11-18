@@ -55,9 +55,9 @@ MARKUP = {
     "Tout réinitialiser": ("Reimposta tutto", "Restablecer todo"),
     "Toute la période": ("Tutto il periodo", "Todo el período"),
     "Ukraine : guerre de haute intensité": ("Ucraina: guerra ad alta intensità", "Ucrania: guerra de alta intensidad"),
-    "Un hexagone par événement, regroupés par semaine. Cliquez sur une semaine pour filtrer la carte, ou sur un hexagone pour l'ouvrir. Les faits antérieurs au 23 septembre n'y figurent pas.":
-        ("Un esagono per evento, raggruppati per settimana. Cliccate su una settimana per filtrare la mappa, o su un esagono per aprirlo. I fatti anteriori al 23 settembre non vi figurano.",
-         "Un hexágono por suceso, agrupados por semana. Haga clic en una semana para filtrar el mapa, o en un hexágono para abrirlo. Los hechos anteriores al 23 de septiembre no figuran en ella."),
+    "Un hexagone par événement, placé à sa date. Cliquez sur une semaine pour filtrer la carte, ou sur un hexagone pour l'ouvrir. Les faits antérieurs au 23 septembre n'y figurent pas.":
+        ("Un esagono per evento, collocato alla sua data. Cliccate su una settimana per filtrare la mappa, o su un esagono per aprirlo. I fatti anteriori al 23 settembre non vi figurano.",
+         "Un hexágono por suceso, situado en su fecha. Haga clic en una semana para filtrar el mapa, o en un hexágono para abrirlo. Los hechos anteriores al 23 de septiembre no figuran en ella."),
     "Un événement manque ?": ("Manca un evento?", "¿Falta un suceso?"),
     "Version bêta": ("Versione beta", "Versión beta"),
     "Voir sur la carte": ("Vedi sulla mappa", "Ver en el mapa"),

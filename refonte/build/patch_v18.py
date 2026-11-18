@@ -3,3 +3,4 @@ sub('      <div class="chr-sc" id="chr-sc">', '      <button class="skip" sc-cam
 sub('      <div style="{{weekGrid}}">', '      <div id="sk-wk" tabindex="-1" style="{{weekGrid}}">')
 sub("skipMap: () => {", "skipChr: () => { const el = document.getElementById('sk-wk'); if (el) el.focus(); }, skipMap: () => {")
 sub(">Événements par semaine<", ">Événements par jour<")
+sub(">Un hexagone par événement, regroupés par semaine. Cliquez", ">Un hexagone par événement, placé à sa date. Cliquez")
