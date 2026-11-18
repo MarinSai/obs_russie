@@ -3,8 +3,8 @@
 # Utilisé par build_lang.py, qui produit observatoire_IT.html et observatoire_ES.html à partir de observatoire.html.
 
 TITLE = {
-    "it": ("Osservatorio: la guerra della Russia", "in Europa"),
-    "es": ("Observatorio de la guerra rusa", "en Europa"),
+    "it": ("Osservatorio della guerra politica", "in Europa"),
+    "es": ("Observatorio de la guerra política", "en Europa"),
 }
 
 # Textes affichés dans la page (entre balises)

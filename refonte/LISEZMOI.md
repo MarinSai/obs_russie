@@ -3,7 +3,7 @@
 La page test (`observatoire_test.html`) est produite à partir de `observatoire.html` (production), jamais modifiée.
 
     python3 tools/unpack.py     # extrait le gabarit de observatoire.html dans unpacked/
-    python3 build/patch.py      # applique les onze passes (patch.py enchaîne patch_v2 à patch_v11)
+    python3 build/patch.py      # applique les douze passes (patch.py enchaîne patch_v2 à patch_v12)
     python3 tools/pack.py       # réécrit le gabarit dans site/observatoire_test.html
 
 - `build/extra.css`, `build/assets.css` : styles ajoutés (hexagones, grain, mouvement réduit).
@@ -22,3 +22,5 @@ le script s'arrête sur le remplacement à revoir au lieu de produire une page f
 `observatoire.html` : elle retire la case « Faits antérieurs au 23 sept. ({{nPasse}}) » et la pastille « Avec les faits
 antérieurs au 23 sept. », et ajoute le nouveau texte du premier chiffre clé, le résumé « dont N faits antérieurs » et « Copier le lien ».
 Sans elle, `build_lang.py` s'arrête (une entrée de la page de production a disparu).
+`i18n/build_lang_production.py` remplace `scripts/build_lang.py` dans ce même commit : il connaît le nouveau titre
+(« Observatoire de la guerre politique en Europe ») et ne réduit plus la taille du titre, que la page française a déjà.

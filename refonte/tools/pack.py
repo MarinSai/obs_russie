@@ -8,6 +8,8 @@ m = re.search(r'(<script type="__bundler/template">)(.*?)(</script>)', src, re.S
 assert json.loads(m.group(2)) == open(os.path.join(ROOT, 'unpacked/template.html'), encoding='utf-8').read()
 enc = json.dumps(tpl, ensure_ascii=False).replace('</', '<\\u002F')
 out = src[:m.start(2)] + enc + src[m.end(2):]
+# titre du chargeur (onglet et message de chargement), hors gabarit
+out = out[:m.start(2)].replace('Observatoire de la guerre russe en Europe', 'Observatoire de la guerre politique en Europe') + out[m.start(2):]
 dst = os.path.join(ROOT, 'site', sys.argv[1] if len(sys.argv) > 1 else 'observatoire_test.html')
 open(dst, 'w', encoding='utf-8').write(out)
 # contrôle : relecture
