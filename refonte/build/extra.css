@@ -211,7 +211,8 @@ header[data-rv]{border-image:linear-gradient(90deg,#5c5b62 0,#2b2b2f 45%,#19191b
 /* décodage du titre : calque superposé, même place que le titre définitif */
 .glitch .tscr{display:none}
 .glitch.dec .treal{visibility:hidden}
-.glitch.dec .tscr{display:block;position:absolute;inset:0;overflow:hidden;white-space:pre;pointer-events:none}
+.glitch.dec .tscr{display:block;position:absolute;inset:0;overflow:visible;clip-path:inset(-0.5em 0 -0.5em 0);white-space:pre;pointer-events:none}
+/* coupé seulement à gauche et à droite : les jambages et le haut des capitales (O, b, t) dépassent la hauteur de ligne */
 
 /* ───── Neuvième passe : derniers événements ajoutés ───── */
 .nwd{width:9px;height:9px;flex:none;border-radius:50%;background:#dd203c;box-shadow:0 0 0 4px rgba(221,32,60,.22)}
