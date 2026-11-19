@@ -41,14 +41,13 @@ def build(lang, k):
     # Titre
     T1, T2 = i18n.TITLE[lang]
     full = T1 + " " + T2
-    rep("Observatoire de la guerre russe en Europe", full)
-    rep("const T1 = 'Observatoire de la guerre russe';", "const T1 = '" + esc_js(T1) + "';")
+    rep("Observatoire de la guerre politique en Europe", full)
+    rep("const T1 = 'Observatoire de la guerre politique';", "const T1 = '" + esc_js(T1) + "';")
     rep("const T2 = 'en Europe';", "const T2 = '" + esc_js(T2) + "';")
     rep("const DATA_URL = '" + DATA_FR + "';", "const DATA_URL = '" + DATA_FR.replace(".json", "-" + lang + ".json") + "';")
     rep('<html lang="fr">', '<html lang="' + lang + '">')
     # Titre plus long qu'en français : un peu plus large et un peu plus petit dans l'ouverture
-    rep("font-size: clamp(64px, 11vw, 176px); line-height: .94; letter-spacing: -.03em; max-width: 11ch;",
-        "font-size: clamp(54px, 8.6vw, 138px); line-height: .94; letter-spacing: -.03em; max-width: 13.5ch;")
+    # (le titre français a désormais le même gabarit que l'italien et l'espagnol : plus de remplacement)
 
     # Libellés des seuils et catégories
     rep("const LBL = {};", "const LBL = " + json.dumps(i18n.LBL[lang], ensure_ascii=False) + ";")
@@ -61,6 +60,26 @@ def build(lang, k):
     if lang == "es":
         rep("const fLong = d => { const p = parse(d); return p.j + ' ' + MOISL[p.m - 1] + ' ' + p.y; };",
             "const fLong = d => { const p = parse(d); return p.j + ' de ' + MOISL[p.m - 1] + ' de ' + p.y; };")
+
+    # Accords (singulier pour 1 seulement) et formes singulier/pluriel des mots composés par PL/PLT
+    rep("const PL = (n, w) => n + PLW[w][n > 1 ? 1 : 0];", "const PL = (n, w) => n + PLW[w][n === 1 ? 0 : 1];")
+    rep("const PLT = (n, w) => PLW[w][n > 1 ? 1 : 0];", "const PLT = (n, w) => PLW[w][n === 1 ? 0 : 1];")
+    plw = {
+        "it": "{ pays: [' paese', ' paesi'], evt: [' evento', ' eventi'], aff: [' evento visualizzato', ' eventi visualizzati'], affT: ['Evento visualizzato', 'Eventi visualizzati'], ant: [' fatto anteriore al 23 sett.', ' fatti anteriori al 23 sett.'] }",
+        "es": "{ pays: [' país', ' países'], evt: [' suceso', ' sucesos'], aff: [' suceso mostrado', ' sucesos mostrados'], affT: ['Suceso mostrado', 'Sucesos mostrados'], ant: [' hecho anterior al 23 sept.', ' hechos anteriores al 23 sept.'] }",
+    }[lang]
+    t, n3 = re.subn(r"const PLW = \{[^\n]*\};", lambda m: "const PLW = " + plw + ";", t)
+    if n3 != 1: missing.append("const PLW")
+    if lang == "it":
+        # élision devant un nombre qui se prononce avec une voyelle (1, 8, 11, 80-89, 800…)
+        rep("const EL = (p, n) => p + n;",
+            "const EL = (p, n) => { const s = String(n); if (s === '1') return p + '1°'; if (/^(1|11)([^\\d°]|$)/.test(s) || /^0?8/.test(s)) { if (/(al|del|dal) $/.test(p)) return p.slice(0, -1) + \"l'\" + s; if (/(^|\\s)dei $/.test(p)) return p.replace(/dei $/, 'degli ') + s; if (/(^|\\s)i $/.test(p)) return p.replace(/i $/, 'gli ') + s; } return p + s; };")
+
+    if lang == "it":
+        # premier du mois : « 1° »
+        t, a1 = re.subn(r"p\.j \+ ' ' \+ (MOISL?)\[", lambda m: "p.j + (p.j === 1 ? '°' : '') + ' ' + " + m.group(1) + "[", t)
+        t, a2 = re.subn(r"(d|dateOfDay\(weekStartDay\(i\)\))\.getDate\(\) \+ ' ' \+ MOIS\[", lambda m: m.group(1) + ".getDate() + (" + m.group(1) + ".getDate() === 1 ? '°' : '') + ' ' + MOIS[", t)
+        if a1 < 3 or a2 < 5: missing.append("dates 1° (%d, %d)" % (a1, a2))
 
     # Pluriel des images
     rep("withMedia.length + ' image' + (withMedia.length > 1 ? 's' : '')",
@@ -85,8 +104,8 @@ def build(lang, k):
         sys.exit(1)
     out = s[:m.start(2)] + json.dumps(t, ensure_ascii=False).replace("</", "<\\u002F") + s[m.end(2):]
     # Titre de l'onglet hors gabarit éventuel
-    out = out.replace("<title>Observatoire de la guerre russe en Europe</title>", "<title>" + full + "</title>")
-    out = out.replace("Observatoire de la guerre russe en Europe", full)
+    out = out.replace("<title>Observatoire de la guerre politique en Europe</title>", "<title>" + full + "</title>")
+    out = out.replace("Observatoire de la guerre politique en Europe", full)
     path = os.path.join(ROOT, "observatoire_russie_" + lang.upper() + ".html")
     open(path, "w", encoding="utf-8").write(out)
     print("écrit", os.path.basename(path))
