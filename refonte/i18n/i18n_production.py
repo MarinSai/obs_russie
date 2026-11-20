@@ -39,7 +39,6 @@ MARKUP = {
     "Opérations russes": ("Operazioni russe", "Operaciones rusas"),
     "Pays les plus visés": ("Paesi più colpiti", "Países más afectados"),
     "Pays visés": ("Paesi colpiti", "Países afectados"),
-    "Rejouer": ("Rivedi", "Reproducir"),
     "Renseignement": ("Intelligence", "Inteligencia"),
     "Russie et Biélorussie": ("Russia e Bielorussia", "Rusia y Bielorrusia"),
     "Passer la carte": ("Salta la mappa", "Saltar el mapa"),
